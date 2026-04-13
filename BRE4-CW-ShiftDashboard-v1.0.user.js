@@ -4,8 +4,8 @@
 // @version      11.1
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
-// @updateURL    https://gist.githubusercontent.com/amritpdh/06b518913b9fcdf3656dccc1961a2ed9/raw/gistfile1.txt
-// @downloadURL  https://gist.githubusercontent.com/amritpdh/06b518913b9fcdf3656dccc1961a2ed9/raw/gistfile1.txt
+// @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
+// @downloadURL  https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
 // @match        https://fclm-portal.amazon.com/reports/processPathRollup*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_openInTab
