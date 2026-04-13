@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      11.1
+// @version      11.2
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -88,14 +88,14 @@
             {name:'Pick - Small',id:'ppr.detail.outbound.pick.pick.small'},
             {name:'Pick - Medium',id:'ppr.detail.outbound.pick.pick.medium'},
             {name:'Pick - Large',id:'ppr.detail.outbound.pick.pick.large'},
-            {name:'Pick - Heavy/Bulky',id:'ppr.detail.outbound.pick.pick.heavyBulky'},
             {name:'Pick - Total',id:'ppr.detail.outbound.pick.pick.total',b:1},
+            {name:'RF Pick',id:'ppr.detail.outbound.pick.pick.total',frPid:'01003001',frMatch:'RF Pick'},
+            {name:'P2R Pick',id:'ppr.detail.outbound.pick.pick.total',frPid:'01003001',frMatch:'Pick To Rebin'},
             {name:'Pick Support',id:'ppr.detail.outbound.pick.pickSupport'},
             {name:'Pick Total (Incl. Support)',id:'ppr.detail.outbound.pick.pick.grossTotal',b:1},
             {name:'Flow Sort - Small',id:'ppr.detail.outbound.sort.flowSort.small'},
             {name:'Flow Sort - Medium',id:'ppr.detail.outbound.sort.flowSort.medium'},
             {name:'Flow Sort - Large',id:'ppr.detail.outbound.sort.flowSort.large'},
-            {name:'Flow Sort - Heavy/Bulky',id:'ppr.detail.outbound.sort.flowSort.heavyBulky'},
             {name:'Flow Sort - Total',id:'ppr.detail.outbound.sort.flowSort.total',b:1},
             {name:'Chutings - Small',id:'ppr.detail.outbound.pack.chuting.small'},
             {name:'Chutings - Medium',id:'ppr.detail.outbound.pack.chuting.medium'},
