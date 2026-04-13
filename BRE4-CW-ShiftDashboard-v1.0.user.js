@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      11.5
+// @version      11.6
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -89,6 +89,8 @@
             {name:'Pick - Medium',id:'ppr.detail.outbound.pick.pick.medium'},
             {name:'Pick - Large',id:'ppr.detail.outbound.pick.pick.large'},
             {name:'Pick - Total',id:'ppr.detail.outbound.pick.pick.total',b:1},
+            {name:'RF Pick',frPid:'01003001',frMatch:'RF Pick'},
+            {name:'P2R Pick',frPid:'01003001',frMatch:'Pick To Rebin'},
             {name:'Pick Support',id:'ppr.detail.outbound.pick.pickSupport'},
             {name:'Pick Total (Incl. Support)',id:'ppr.detail.outbound.pick.pick.grossTotal',b:1},
             {name:'Flow Sort - Small',id:'ppr.detail.outbound.sort.flowSort.small'},
@@ -290,6 +292,49 @@
         nx();
     }
     function GS(di,sn,spIdx){return(_supDetail[di]&&_supDetail[di][sn]&&_supDetail[di][sn][spIdx])||[];}
+
+    var _frData={};
+    function parseFRRate(html,matchName){
+        var doc=new DOMParser().parseFromString(html,"text/html");
+        var tables=doc.querySelectorAll("table");
+        for(var ti=0;ti<tables.length;ti++){
+            var trs=tables[ti].querySelectorAll("tbody tr");var curF="";
+            for(var r=0;r<trs.length;r++){
+                var th=trs[r].querySelector("th");var tds=trs[r].querySelectorAll("td");
+                if(th){var ht=th.textContent.trim();if(ht&&ht!=="-"&&ht!=="Total")curF=ht;}
+                if(matchName!=="*ALL*"&&curF.toLowerCase().indexOf(matchName.toLowerCase())===-1)continue;
+                if(tds.length>=2&&tds[0].textContent.trim()==="Total"){
+                    var hrs=pN(tds[1].textContent.trim());var nums=[];
+                    for(var c=2;c<tds.length;c++)nums.push(pN(tds[c].textContent.trim()));
+                    var rate=nums.length>=4&&nums[2]>0?nums[3]:(nums.length>1?nums[1]:0);
+                    return{tph:rate,hrs:hrs};
+                }
+            }
+        }
+        return null;
+    }
+    function GFR(di,sn,pid,match){var h=_frData[di+"_"+sn+"_"+pid];return h?parseFRRate(h,match):null;}
+    function fetchFRData(onP,onD){
+        _frData={};
+        var pids={};
+        for(var s=0;s<OPS.length;s++){for(var it=0;it<OPS[s].items.length;it++){var itm=OPS[s].items[it];if(itm.frPid)pids[itm.frPid]=1;}}
+        var pidList=Object.keys(pids);if(!pidList.length){onD();return;}
+        var q=[];
+        for(var di=0;di<_days.length;di++){var day=_days[di];var sh=shDay(day);
+            for(var si=0;si<sh.length;si++){for(var pi=0;pi<pidList.length;pi++){
+                var url=buildFRUrl(day,sh[si],pidList[pi]);
+                if(url)q.push({di:di,sn:sh[si].name,pid:pidList[pi],url:url});}}}
+        var total=q.length,done=0,idx=0,act=0;
+        if(!total){onD();return;}
+        function fin(){done++;act--;onP(done,total);if(done>=total)onD();else nx();}
+        function nx(){while(act<3&&idx<q.length){(function(j){act++;
+            GM_xmlhttpRequest({method:"GET",url:j.url,timeout:15000,
+                onload:function(r){if(r.status===200&&r.responseText)_frData[j.di+"_"+j.sn+"_"+j.pid]=r.responseText;fin();},
+                onerror:function(){fin();},
+                ontimeout:function(){fin();}});
+        })(q[idx]);idx++;}}
+        nx();
+    }
 
     // Ã¢â€â‚¬Ã¢â€â‚¬ UI HELPERS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     var TH='padding:5px 8px;border:1px solid #ccc;color:#222;font-size:0.78em;text-align:center;white-space:nowrap;';
@@ -557,7 +602,7 @@
                     var itr=el('tr','background:'+bgc+';');
                     itr.appendChild(el('td',TD+'text-align:left;padding-left:'+(item.b?'6':'14')+'px;position:sticky;left:0;background:'+bgc+';z-index:1;'+(item.b?'font-weight:bold;':''),item.name));
                     var iST=0,iSD=0,iC=0;
-                    for(var dk4=0;dk4<dayDefs.length;dk4++){var d=G(dayDefs[dk4].di,shift,item.id);var tp2=d?d.tphN:0,dl2=d?d.dltN:0;iST+=tp2;iSD+=dl2;if(tp2)iC++;
+                    for(var dk4=0;dk4<dayDefs.length;dk4++){var d=item.id?G(dayDefs[dk4].di,shift,item.id):null;var fr=item.frPid?GFR(dayDefs[dk4].di,shift,item.frPid,item.frMatch):null;var tp2=fr?fr.tph:(d?d.tphN:0),dl2=d?d.dltN:0;iST+=tp2;iSD+=dl2;if(tp2)iC++;
                         itr.appendChild(el('td',TD+(item.b?'font-weight:bold;border-left:2px solid #999;':'border-left:2px solid #999;'),fmtN(tp2)));itr.appendChild(el('td',TD+'color:'+dC(dl2)+';'+(item.b?'font-weight:bold;':''),fmtD(dl2)));}
                     itr.appendChild(el('td',TD+'font-weight:bold;color:#4caf50;border-left:2px solid #999;',fmtAvg(iC?(iST/iC):0)));
                     itr.appendChild(el('td',TD+'font-weight:bold;color:'+dC(iSD)+';',fmtD(iSD)));
@@ -1052,18 +1097,18 @@
             // Calculate total steps using week days directly
             var wkd=wkDays(_cw,_yr);var pprQ=0;for(var pi=0;pi<wkd.length;pi++){pprQ+=shDay(wkd[pi]).length+1;}
             var supQ=0;for(var si2=0;si2<wkd.length;si2++){var ssh2=shDay(wkd[si2]);for(var sj2=0;sj2<ssh2.length;sj2++)supQ+=SUPS.length;}
-            var grandTotal=pprQ+supQ,grandDone=0;
+            var frPidCount=0;for(var fp=0;fp<OPS.length;fp++){for(var fi2=0;fi2<OPS[fp].items.length;fi2++){if(OPS[fp].items[fi2].frPid)frPidCount++;}}var frPids2={};for(var fp2=0;fp2<OPS.length;fp2++){for(var fi3=0;fi3<OPS[fp2].items.length;fi3++){var itm2=OPS[fp2].items[fi3];if(itm2.frPid)frPids2[itm2.frPid]=1;}}var frQ=Object.keys(frPids2).length;var frTotal=0;for(var fw=0;fw<wkd.length;fw++)frTotal+=shDay(wkd[fw]).length*frQ;var grandTotal=pprQ+supQ+frTotal,grandDone=0;
             function pUp(label,done,total){grandDone++;var pct=grandTotal?Math.round((grandDone/grandTotal)*100):0;pBarInner.style.width=pct+'%';pPct.textContent=pct+'%';pLabel.textContent=label+' '+done+'/'+total;}
             fetchAll(
                 function(s){pUp('PPR Data',s.done,s.total);stB.textContent='PPR: '+s.done+'/'+s.total;},
                 function(){
                     fetchSupDetail(function(s2){pUp('Support Detail',s2.done,s2.total);stB.textContent='Support: '+s2.done+'/'+s2.total;},function(){
-                    pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';
+                    pLabel.textContent='\u23f3 Loading rates...';fetchFRData(function(d,t){var pct2=grandTotal?Math.round((grandDone+d)/(grandTotal)*100):0;pBarInner.style.width=pct2+'%';pPct.textContent=pct2+'%';pLabel.textContent='Rates '+d+'/'+t;},function(){pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';
                     pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';
                         ldB.disabled=false;ldB.textContent='\u21bb Reload';
                         var now=new Date();stB.textContent='\u2705 '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());stB.style.color='#4caf50';
                         rOverview(tP.ov);rByShift(tP.bs);rCompare(tP.cp);rSnapshot(tP.sn);
-                        if(_isScriptReload)_restoreTabState();_isScriptReload=false;
+                        if(_isScriptReload)_restoreTabState();_isScriptReload=false;});
                     });
                 });
         }
