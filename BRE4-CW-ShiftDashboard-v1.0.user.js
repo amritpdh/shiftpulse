@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      11.3
+// @version      11.4
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -305,21 +305,16 @@
             }
         }
 
-        // Also fetch Function Rollup for items with frPid
-        var frPids=[];for(var os=0;os<OPS.length;os++){for(var oi=0;oi<OPS[os].items.length;oi++){var itm=OPS[os].items[oi];if(itm.frPid&&!frPids.some(function(p){return p.pid===itm.frPid;}))frPids.push({pid:itm.frPid});}}
-        for(var fdi=0;fdi<_days.length;fdi++){var fday=_days[fdi];var fsh=shDay(fday);for(var fsi=0;fsi<fsh.length;fsi++){for(var fpi=0;fpi<frPids.length;fpi++){var furl=buildFRUrl(fday,fsh[fsi],frPids[fpi].pid);if(furl)q.push({di:fdi,sn:fsh[fsi].name,frPid:frPids[fpi].pid,url:furl});}}}
-        var total=q.length,done=0,idx=0,act=0;
-        if(!q.length){onD();return;}
         function nx(){while(act<CONFIG.maxConcurrent&&idx<q.length){(function(j){act++;
         fP(j.url,function(h){
-                if(h){if(j.frPid){_frRateData[j.di+'_'+j.sn+'_'+j.frPid]=h;}else{if(!_supDetail[j.di])_supDetail[j.di]={};if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=parseFR(h);}}
-                else{if(!j.frPid){if(!_supDetail[j.di])_supDetail[j.di]={};if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=[];}}
+                if(h){if(!_supDetail[j.di])_supDetail[j.di]={};if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=parseFR(h);}
+                else{if(!_supDetail[j.di])_supDetail[j.di]={};if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=[];}
                 if(done>=total)onD();else nx();
             });})(q[idx]);idx++;}}
         nx();
     }
     function GS(di,sn,spIdx){return(_supDetail[di]&&_supDetail[di][sn]&&_supDetail[di][sn][spIdx])||[];}
-    function GFR(di,sn,pid,match){var h=_frRateData[di+'_'+sn+'_'+pid];return h?parseFRRate(h,match):null;}
+    function GFR(di,sn,pid,match){var k=di+'_'+sn+'_'+pid;var h=_frRateData[k];if(h===undefined){_frRateData[k]=null;var day=_days[di];var shifts=shDay(day);var shift=null;for(var j=0;j<shifts.length;j++){if(shifts[j].name===sn){shift=shifts[j];break;}}var url=buildFRUrl(day,shift,pid);if(url)GM_xmlhttpRequest({method:'GET',url:url,timeout:15000,onload:function(r){if(r.status===200)_frRateData[k]=r.responseText;},onerror:function(){},ontimeout:function(){}});return null;}return h?parseFRRate(h,match):null;}
 
     // Ã¢â€â‚¬Ã¢â€â‚¬ UI HELPERS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     var TH='padding:5px 8px;border:1px solid #ccc;color:#222;font-size:0.78em;text-align:center;white-space:nowrap;';
