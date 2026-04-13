@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      11.4
+// @version      11.5
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -89,8 +89,6 @@
             {name:'Pick - Medium',id:'ppr.detail.outbound.pick.pick.medium'},
             {name:'Pick - Large',id:'ppr.detail.outbound.pick.pick.large'},
             {name:'Pick - Total',id:'ppr.detail.outbound.pick.pick.total',b:1},
-            {name:'RF Pick',frPid:'01003001',frMatch:'RF Pick'},
-            {name:'P2R Pick',frPid:'01003001',frMatch:'Pick To Rebin'},
             {name:'Pick Support',id:'ppr.detail.outbound.pick.pickSupport'},
             {name:'Pick Total (Incl. Support)',id:'ppr.detail.outbound.pick.pick.grossTotal',b:1},
             {name:'Flow Sort - Small',id:'ppr.detail.outbound.sort.flowSort.small'},
@@ -195,7 +193,7 @@
 
 
     // -- SUPPORT DETAIL (Function Rollup) -----------
-    var _supDetail={},_frRateData={};
+    var _supDetail={};
 
     function buildFRUrl(date,shift,pid){
         var ds=date.getFullYear()+'-'+pad(date.getMonth()+1)+'-'+pad(date.getDate());
@@ -265,30 +263,6 @@
         return result;
     }
 
-    // Parse Function Rollup for rate data (TPH/volume/hours) for a specific sub-function
-    function parseFRRate(html,matchName){
-        var doc=new DOMParser().parseFromString(html,"text/html");
-        var tables=doc.querySelectorAll("table");
-        for(var ti=0;ti<tables.length;ti++){
-            var rows=tables[ti].querySelectorAll("tbody tr");
-            var curF="";
-            for(var r=0;r<rows.length;r++){
-                var th=rows[r].querySelector("th");
-                var tds=rows[r].querySelectorAll("td");
-                if(th){var ht=th.textContent.trim();if(ht&&ht!=="-"&&ht!=="Total")curF=ht;}
-                if(matchName!=="*ALL*"&&curF.toLowerCase().indexOf(matchName.toLowerCase())===-1)continue;
-                if(tds.length>=2&&tds[0].textContent.trim()==="Total"){
-                    var hrs=pN(tds[1].textContent.trim());
-                    var nums=[];for(var c=2;c<tds.length;c++)nums.push(pN(tds[c].textContent.trim()));
-                    var vol=0,rate=0;
-                    if(nums.length>=4&&nums[2]>0){vol=nums[2];rate=nums[3];}else{vol=nums.length>0?nums[0]:0;rate=nums.length>1?nums[1]:0;}
-                    return{tph:rate,vol:vol,hrs:hrs};
-                }
-            }
-        }
-        return null;
-    }
-
     function fetchSupDetail(onP,onD){
         _supDetail={};
         var q=[];
@@ -304,17 +278,18 @@
                 }
             }
         }
-
+        if(!q.length){onD();return;}
+        var total=q.length,done=0,idx=0,act=0;
         function nx(){while(act<CONFIG.maxConcurrent&&idx<q.length){(function(j){act++;
-        fP(j.url,function(h){
-                if(h){if(!_supDetail[j.di])_supDetail[j.di]={};if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=parseFR(h);}
-                else{if(!_supDetail[j.di])_supDetail[j.di]={};if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=[];}
+            fP(j.url,function(h){
+                if(h){if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=parseFR(h);}
+                else{if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=[];}
+                done++;act--;onP({done:done,total:total});
                 if(done>=total)onD();else nx();
             });})(q[idx]);idx++;}}
         nx();
     }
     function GS(di,sn,spIdx){return(_supDetail[di]&&_supDetail[di][sn]&&_supDetail[di][sn][spIdx])||[];}
-    function GFR(di,sn,pid,match){var k=di+'_'+sn+'_'+pid;var h=_frRateData[k];if(h===undefined){_frRateData[k]=null;var day=_days[di];var shifts=shDay(day);var shift=null;for(var j=0;j<shifts.length;j++){if(shifts[j].name===sn){shift=shifts[j];break;}}var url=buildFRUrl(day,shift,pid);if(url)GM_xmlhttpRequest({method:'GET',url:url,timeout:15000,onload:function(r){if(r.status===200)_frRateData[k]=r.responseText;},onerror:function(){},ontimeout:function(){}});return null;}return h?parseFRRate(h,match):null;}
 
     // Ã¢â€â‚¬Ã¢â€â‚¬ UI HELPERS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     var TH='padding:5px 8px;border:1px solid #ccc;color:#222;font-size:0.78em;text-align:center;white-space:nowrap;';
@@ -582,7 +557,7 @@
                     var itr=el('tr','background:'+bgc+';');
                     itr.appendChild(el('td',TD+'text-align:left;padding-left:'+(item.b?'6':'14')+'px;position:sticky;left:0;background:'+bgc+';z-index:1;'+(item.b?'font-weight:bold;':''),item.name));
                     var iST=0,iSD=0,iC=0;
-                    for(var dk4=0;dk4<dayDefs.length;dk4++){var d=item.frPid?null:G(dayDefs[dk4].di,shift,item.id);var fr=item.frPid?GFR(dayDefs[dk4].di,shift,item.frPid,item.frMatch):null;var tp2=fr?fr.tph:(d?d.tphN:0),dl2=fr?0:(d?d.dltN:0);iST+=tp2;iSD+=dl2;if(tp2)iC++;
+                    for(var dk4=0;dk4<dayDefs.length;dk4++){var d=G(dayDefs[dk4].di,shift,item.id);var tp2=d?d.tphN:0,dl2=d?d.dltN:0;iST+=tp2;iSD+=dl2;if(tp2)iC++;
                         itr.appendChild(el('td',TD+(item.b?'font-weight:bold;border-left:2px solid #999;':'border-left:2px solid #999;'),fmtN(tp2)));itr.appendChild(el('td',TD+'color:'+dC(dl2)+';'+(item.b?'font-weight:bold;':''),fmtD(dl2)));}
                     itr.appendChild(el('td',TD+'font-weight:bold;color:#4caf50;border-left:2px solid #999;',fmtAvg(iC?(iST/iC):0)));
                     itr.appendChild(el('td',TD+'font-weight:bold;color:'+dC(iSD)+';',fmtD(iSD)));
