@@ -289,7 +289,7 @@
         var total=q.length,done=0,idx=0,act=0;
         function nx(){while(act<CONFIG.maxConcurrent&&idx<q.length){(function(j){act++;
             fP(j.url,function(h){
-                if(!_supDetail[j.di])_supDetail[j.di]={};if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};var parsed=parseFR(h);_supDetail[j.di][j.sn][j.sp]=parsed;if(j.di===0)console.log('[SUP] di='+j.di+' sn='+j.sn+' sp='+j.sp+' funcs='+parsed.length+(parsed.length?(' first='+parsed[0].name+' hrs='+parsed[0].hours):''));
+                if(h){if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=parseFR(h);}
                 else{if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=[];}
                 done++;act--;onP({done:done,total:total});
                 if(done>=total)onD();else nx();
@@ -297,66 +297,6 @@
         nx();
     }
     function GS(di,sn,spIdx){return(_supDetail[di]&&_supDetail[di][sn]&&_supDetail[di][sn][spIdx])||[];}
-
-    var _frData={};
-    function parseFRRate(html,matchName){
-        var doc=new DOMParser().parseFromString(html,"text/html");
-        var tables=doc.querySelectorAll("table");
-        for(var ti=0;ti<tables.length;ti++){
-            var trs=tables[ti].querySelectorAll("tbody tr");var curF="";
-            for(var r=0;r<trs.length;r++){
-                var th=trs[r].querySelector("th");var tds=trs[r].querySelectorAll("td");
-                if(th){var ht=th.textContent.trim();if(ht&&ht!=="-"&&ht!=="Total")curF=ht;}
-                if(matchName!=="*ALL*"&&curF.toLowerCase().indexOf(matchName.toLowerCase())===-1)continue;
-                if(tds.length>=2&&tds[0].textContent.trim()==="Total"){
-                    var hrs=pN(tds[1].textContent.trim());var nums=[];
-                    for(var c=2;c<tds.length;c++)nums.push(pN(tds[c].textContent.trim()));
-                    var rate=0;for(var ni=3;ni<nums.length;ni+=4){if(nums[ni]>0){rate=nums[ni];break;}}if(!rate){for(var ni2=1;ni2<nums.length;ni2+=2){if(nums[ni2]>0){rate=nums[ni2];break;}}}
-                    return{tph:rate,hrs:hrs};
-                }
-            }
-        }
-        // Fallback: try per-function employee tables (like support)
-        var blocks=html.split(/<table\b/i);
-        for(var t=1;t<blocks.length;t++){
-            var capM=blocks[t].match(/<caption[^>]*>([\s\S]*?)<\/caption>/i);
-            if(!capM)continue;
-            var cap=capM[1].replace(/<[^>]+>/g,"").trim();
-            if(matchName!=="*ALL*"&&cap.toLowerCase().indexOf(matchName.toLowerCase())===-1)continue;
-            var d2=new DOMParser().parseFromString("<table"+blocks[t],"text/html");
-            var rows=d2.querySelectorAll("tr");var totalH=0;var totalU=0;var totalR=0;var cnt=0;
-            for(var r2=0;r2<rows.length;r2++){
-                var td2=rows[r2].querySelectorAll("td");if(td2.length<4)continue;
-                var tp=td2[0].textContent.trim();if(tp!=="AMZN"&&tp!=="TMPF"&&tp!=="TEMP")continue;
-                var nst=[];for(var c2=0;c2<td2.length;c2++){var cc=(td2[c2].className||"");if(cc.indexOf("numeric")>-1&&cc.indexOf("size-total")>-1)nst.push(pN(td2[c2].textContent.trim()));}
-                if(nst.length>=2&&nst[1]>0){totalU+=nst[0];totalR+=nst[1];cnt++;}
-            }
-            if(cnt>0){var avgR=totalR/cnt;return{tph:avgR,hrs:0};}
-        }
-        return null;
-    }
-    function GFR(di,sn,pid,match){var k=di+'_'+sn+'_'+pid;var h=_frData[k];return h?parseFRRate(h,match):null;}
-    function fetchFRData(onP,onD){
-        _frData={};
-        var pids={};
-        for(var s=0;s<OPS.length;s++){for(var it=0;it<OPS[s].items.length;it++){var itm=OPS[s].items[it];if(itm.frPid)pids[itm.frPid]=1;}}
-        var pidList=Object.keys(pids);if(!pidList.length){onD();return;}
-        var q=[];
-        for(var di=0;di<_days.length;di++){var day=_days[di];var sh=shDay(day);
-            for(var si=0;si<sh.length;si++){for(var pi=0;pi<pidList.length;pi++){
-                var url=buildFRUrl(day,sh[si],pidList[pi]);
-                if(url)q.push({di:di,sn:sh[si].name,pid:pidList[pi],url:url});}}}
-        var total=q.length,done=0,idx=0,act=0;
-        if(!total){onD();return;}
-        function fin(){done++;act--;onP(done,total);if(done>=total)onD();else nx();}
-        function nx(){while(act<3&&idx<q.length){(function(j){act++;
-            GM_xmlhttpRequest({method:"GET",url:j.url,timeout:15000,
-                onload:function(r){if(r.status===200&&r.responseText)_frData[j.di+"_"+j.sn+"_"+j.pid]=r.responseText;fin();},
-                onerror:function(){fin();},
-                ontimeout:function(){fin();}});
-        })(q[idx]);idx++;}}
-        nx();
-    }
 
     // Ã¢â€â‚¬Ã¢â€â‚¬ UI HELPERS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     var TH='padding:5px 8px;border:1px solid #ccc;color:#222;font-size:0.78em;text-align:center;white-space:nowrap;';
@@ -1119,13 +1059,13 @@
             // Calculate total steps using week days directly
             var wkd=wkDays(_cw,_yr);var pprQ=0;for(var pi=0;pi<wkd.length;pi++){pprQ+=shDay(wkd[pi]).length+1;}
             var supQ=0;for(var si2=0;si2<wkd.length;si2++){var ssh2=shDay(wkd[si2]);for(var sj2=0;sj2<ssh2.length;sj2++)supQ+=SUPS.length;}
-            var frPidCount=0;for(var fp=0;fp<OPS.length;fp++){for(var fi2=0;fi2<OPS[fp].items.length;fi2++){if(OPS[fp].items[fi2].frPid)frPidCount++;}}var frPids2={};for(var fp2=0;fp2<OPS.length;fp2++){for(var fi3=0;fi3<OPS[fp2].items.length;fi3++){var itm2=OPS[fp2].items[fi3];if(itm2.frPid)frPids2[itm2.frPid]=1;}}var frQ=Object.keys(frPids2).length;var frTotal=0;for(var fw=0;fw<wkd.length;fw++)frTotal+=shDay(wkd[fw]).length*frQ;var grandTotal=pprQ+supQ+frTotal,grandDone=0;
+            var frPids2={};for(var fp=0;fp<OPS.length;fp++){for(var fi2=0;fi2<OPS[fp].items.length;fi2++){if(OPS[fp].items[fi2].frPid)frPids2[OPS[fp].items[fi2].frPid]=1;}}var frQ=Object.keys(frPids2).length;var frTotal=0;for(var fw=0;fw<wkd.length;fw++)frTotal+=shDay(wkd[fw]).length*frQ;var grandTotal=pprQ+supQ+frTotal,grandDone=0;
             function pUp(label,done,total){grandDone++;var pct=grandTotal?Math.round((grandDone/grandTotal)*100):0;pBarInner.style.width=pct+'%';pPct.textContent=pct+'%';pLabel.textContent=label+' '+done+'/'+total;}
             fetchAll(
                 function(s){pUp('PPR Data',s.done,s.total);stB.textContent='PPR: '+s.done+'/'+s.total;},
                 function(){
                     fetchSupDetail(function(s2){pUp('Support Detail',s2.done,s2.total);stB.textContent='Support: '+s2.done+'/'+s2.total;},function(){
-                    pLabel.textContent='\u23f3 Loading rates...';fetchFRData(function(d,t){var pct2=grandTotal?Math.round((grandDone+d)/(grandTotal)*100):0;pBarInner.style.width=pct2+'%';pPct.textContent=pct2+'%';pLabel.textContent='Rates '+d+'/'+t;},function(){pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';
+                    pLabel.textContent='\u23f3 Loading rates...';fetchFRData(function(d,t){var pct2=grandTotal?Math.round((grandDone+d)/grandTotal*100):0;pBarInner.style.width=pct2+'%';pPct.textContent=pct2+'%';pLabel.textContent='Rates '+d+'/'+t;},function(){pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';
                     pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';
                         ldB.disabled=false;ldB.textContent='\u21bb Reload';
                         var now=new Date();stB.textContent='\u2705 '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());stB.style.color='#4caf50';
