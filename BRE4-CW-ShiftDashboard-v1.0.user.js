@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      12.6
+// @version      12.7
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -107,8 +107,8 @@
             {name:'Pack Singles - Small',id:'ppr.detail.outbound.pack.packSingle.small'},
             {name:'Pack Singles - Medium',id:'ppr.detail.outbound.pack.packSingle.medium'},
             {name:'Pack Singles - Large',id:'ppr.detail.outbound.pack.packSingle.large'},
-            {name:'SingleMedium2',frPid:'01002993',frMatch:'Pack Kaizen 1'},
             {name:'SingleMedium',frPid:'01002993',frMatch:'Scan Verify Medium'},
+            {name:'SingleMedium2',frPid:'01002993',frMatch:'Pack Kaizen 1'},
             {name:'SingleNoSLAM',frPid:'01002993',frMatch:'Slam At Pack'},
             {name:'Pack Singles - Total',id:'ppr.detail.outbound.pack.packSingle.total',b:1},
             {name:'Pack Multis - Small',id:'ppr.detail.outbound.pack.packMultis.small'},
