@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      11.7
+// @version      11.8
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -315,7 +315,7 @@
         }
         return null;
     }
-    function GFR(di,sn,pid,match){var h=_frData[di+"_"+sn+"_"+pid];return h?parseFRRate(h,match):null;}
+    function GFR(di,sn,pid,match){var k=di+'_'+sn+'_'+pid;var h=_frData[k];if(!h)return null;var doc=new DOMParser().parseFromString(h,'text/html');var trs=doc.querySelectorAll('tbody tr');var fns=[];var curF='';for(var r=0;r<trs.length;r++){var th=trs[r].querySelector('th');if(th){var ht=th.textContent.trim();if(ht&&ht!=='-'&&ht!=='Total'){curF=ht;if(fns.indexOf(curF)===-1)fns.push(curF);}}}if(match&&fns.length)console.log('[GFR] pid='+pid+' match='+match+' functions='+fns.join(', '));return parseFRRate(h,match);}
     function fetchFRData(onP,onD){
         _frData={};
         var pids={};
