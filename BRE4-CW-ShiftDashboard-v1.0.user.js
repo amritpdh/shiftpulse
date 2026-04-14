@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      12.7
+// @version      12.8
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -798,9 +798,9 @@
                 for(var di3=0;di3<_days.length;di3++){var day3=_days[di3];
                     var itr2=el('tr','background:'+(di3%2===0?'#fff':'#f5f6f8')+';');
                     itr2.appendChild(el('td',TD+'text-align:left;font-weight:bold;',DDE[day3.getDay()]+' '+fSh(day3)));
-                    for(var sn7=0;sn7<sn.length;sn7++){var d2=G(di3,sn[sn7],item2.id);
-                        itr2.appendChild(el('td',TD,d2?d2.tph:'-'));
-                        itr2.appendChild(el('td',TD+'color:'+dC(d2?d2.dltN:0)+';',d2?d2.dlt:'-'));}
+                    for(var sn7=0;sn7<sn.length;sn7++){var d2=item2.id?G(di3,sn[sn7],item2.id):null;var fr2=item2.frPid?GFR(di3,sn[sn7],item2.frPid,item2.frMatch):null;
+                        itr2.appendChild(el('td',TD,fr2?fr2.tph.toLocaleString():(d2?d2.tph:'-')));
+                        itr2.appendChild(el('td',TD+'color:'+dC((item2.frPid?0:(d2?d2.dltN:0)))+';',(item2.frPid?'-':(d2?d2.dlt:'-'))));}
                     itb.appendChild(itr2);}
                 it.appendChild(itb);
                 col(pp2,item2.name,'#aaa',it,false);
@@ -912,8 +912,8 @@
                 var sh=shDay(day);var hasShift=false;
                 for(var j=0;j<sh.length;j++){if(sh[j].name===shift){hasShift=true;break;}}
                 if(!hasShift)continue;
-                var d=G(di,shift,item.id);
-                var tph=d?d.tphN:0;
+                var d=item.id?G(di,shift,item.id):null;var fr=item.frPid?GFR(di,shift,item.frPid,item.frMatch):null;
+                var tph=fr?fr.tph:(d?d.tphN:0);
                 dayData.push({day:day,tph:tph});
                 sum+=tph;if(tph)cnt++;
             }
