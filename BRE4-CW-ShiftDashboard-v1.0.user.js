@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      12.3
+// @version      12.4
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -308,7 +308,7 @@
                 if(tds.length>=2&&tds[0].textContent.trim()==="Total"){
                     var hrs=pN(tds[1].textContent.trim());var nums=[];
                     for(var c=2;c<tds.length;c++)nums.push(pN(tds[c].textContent.trim()));
-                    var rate=nums.length>=4&&nums[2]>0?nums[3]:(nums.length>1?nums[1]:0);
+                    var rate=0;for(var ni=3;ni<nums.length;ni+=4){if(nums[ni]>0){rate=nums[ni];break;}}if(!rate){for(var ni2=1;ni2<nums.length;ni2+=2){if(nums[ni2]>0){rate=nums[ni2];break;}}}
                     return{tph:rate,hrs:hrs};
                 }
             }
