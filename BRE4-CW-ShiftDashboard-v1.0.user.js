@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      12.8
+// @version      12.9
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -865,7 +865,7 @@
         for(var s=0;s<OPS.length;s++){
             allItems.push({label:OPS[s].label+' Total',id:OPS[s].tid,sec:OPS[s].label,color:OPS[s].color});
             for(var i=0;i<OPS[s].items.length;i++)
-                allItems.push({label:OPS[s].items[i].name,id:OPS[s].items[i].id,sec:OPS[s].label,color:OPS[s].color});
+                allItems.push({label:OPS[s].items[i].name,id:OPS[s].items[i].id,frPid:OPS[s].items[i].frPid,frMatch:OPS[s].items[i].frMatch,sec:OPS[s].label,color:OPS[s].color});
         }
         var sn=shNames();
 
