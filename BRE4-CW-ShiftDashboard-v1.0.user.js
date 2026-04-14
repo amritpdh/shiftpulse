@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      12.2
+// @version      12.3
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -98,7 +98,7 @@
             {name:'Flow Sort - Large',id:'ppr.detail.outbound.sort.flowSort.large'},
             {name:'Flow Sort - Total',id:'ppr.detail.outbound.sort.flowSort.total',b:1},
             {name:'AFE1 Induct',frPid:'01003051',frMatch:'AFE1 Induct'},
-            {name:'AFE1 Rebin',frPid:'01003051',frMatch:'AFE1 Rebin'},
+            {name:'AFE 1 Rebin',frPid:'01003051',frMatch:'AFE 1 Rebin'},
             {name:'Chutings - Small',id:'ppr.detail.outbound.pack.chuting.small'},
             {name:'Chutings - Medium',id:'ppr.detail.outbound.pack.chuting.medium'},
             {name:'Chutings - Large',id:'ppr.detail.outbound.pack.chuting.large'},
@@ -312,6 +312,23 @@
                     return{tph:rate,hrs:hrs};
                 }
             }
+        }
+        // Fallback: try per-function employee tables (like support)
+        var blocks=html.split(/<table\b/i);
+        for(var t=1;t<blocks.length;t++){
+            var capM=blocks[t].match(/<caption[^>]*>([\s\S]*?)<\/caption>/i);
+            if(!capM)continue;
+            var cap=capM[1].replace(/<[^>]+>/g,"").trim();
+            if(matchName!=="*ALL*"&&cap.toLowerCase().indexOf(matchName.toLowerCase())===-1)continue;
+            var d2=new DOMParser().parseFromString("<table"+blocks[t],"text/html");
+            var rows=d2.querySelectorAll("tr");var totalH=0;var totalU=0;var totalR=0;var cnt=0;
+            for(var r2=0;r2<rows.length;r2++){
+                var td2=rows[r2].querySelectorAll("td");if(td2.length<4)continue;
+                var tp=td2[0].textContent.trim();if(tp!=="AMZN"&&tp!=="TMPF"&&tp!=="TEMP")continue;
+                var nst=[];for(var c2=0;c2<td2.length;c2++){var cc=(td2[c2].className||"");if(cc.indexOf("numeric")>-1&&cc.indexOf("size-total")>-1)nst.push(pN(td2[c2].textContent.trim()));}
+                if(nst.length>=2&&nst[1]>0){totalU+=nst[0];totalR+=nst[1];cnt++;}
+            }
+            if(cnt>0){var avgR=totalR/cnt;return{tph:avgR,hrs:0};}
         }
         return null;
     }
