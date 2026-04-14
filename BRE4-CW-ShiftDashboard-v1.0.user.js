@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      12.1
+// @version      12.2
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -98,7 +98,7 @@
             {name:'Flow Sort - Large',id:'ppr.detail.outbound.sort.flowSort.large'},
             {name:'Flow Sort - Total',id:'ppr.detail.outbound.sort.flowSort.total',b:1},
             {name:'AFE1 Induct',frPid:'01003051',frMatch:'AFE1 Induct'},
-            {name:'AFE 1 Rebin',frPid:'01003051',frMatch:'AFE 1 Rebin'},
+            {name:'AFE1 Rebin',frPid:'01003051',frMatch:'AFE1 Rebin'},
             {name:'Chutings - Small',id:'ppr.detail.outbound.pack.chuting.small'},
             {name:'Chutings - Medium',id:'ppr.detail.outbound.pack.chuting.medium'},
             {name:'Chutings - Large',id:'ppr.detail.outbound.pack.chuting.large'},
@@ -315,7 +315,7 @@
         }
         return null;
     }
-    function GFR(di,sn,pid,match){var k=di+'_'+sn+'_'+pid;var h=_frData[k];if(!h)return null;var r=parseFRRate(h,match);if(match&&match.indexOf('Rebin')>-1&&di===0)console.log('[GFR-Rebin] sn='+sn+' result='+JSON.stringify(r));return r;}
+    function GFR(di,sn,pid,match){var k=di+'_'+sn+'_'+pid;var h=_frData[k];return h?parseFRRate(h,match):null;}
     function fetchFRData(onP,onD){
         _frData={};
         var pids={};
