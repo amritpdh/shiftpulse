@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      12.5
+// @version      12.6
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -88,17 +88,17 @@
             {name:'Pick - Small',id:'ppr.detail.outbound.pick.pick.small'},
             {name:'Pick - Medium',id:'ppr.detail.outbound.pick.pick.medium'},
             {name:'Pick - Large',id:'ppr.detail.outbound.pick.pick.large'},
-            {name:'Pick - Total',id:'ppr.detail.outbound.pick.pick.total',b:1},
             {name:'RF Pick',frPid:'01003001',frMatch:'RF Pick'},
             {name:'P2R Pick',frPid:'01003001',frMatch:'Pick To Rebin'},
+            {name:'Pick - Total',id:'ppr.detail.outbound.pick.pick.total',b:1},
             {name:'Pick Support',id:'ppr.detail.outbound.pick.pickSupport'},
             {name:'Pick Total (Incl. Support)',id:'ppr.detail.outbound.pick.pick.grossTotal',b:1},
             {name:'Flow Sort - Small',id:'ppr.detail.outbound.sort.flowSort.small'},
             {name:'Flow Sort - Medium',id:'ppr.detail.outbound.sort.flowSort.medium'},
             {name:'Flow Sort - Large',id:'ppr.detail.outbound.sort.flowSort.large'},
-            {name:'Flow Sort - Total',id:'ppr.detail.outbound.sort.flowSort.total',b:1},
             {name:'AFE1 Induct',frPid:'01003051',frMatch:'AFE1 Induct'},
             {name:'AFE 1 Rebin',frPid:'01003051',frMatch:'AFE 1 Rebin'},
+            {name:'Flow Sort - Total',id:'ppr.detail.outbound.sort.flowSort.total',b:1},
             {name:'Chutings - Small',id:'ppr.detail.outbound.pack.chuting.small'},
             {name:'Chutings - Medium',id:'ppr.detail.outbound.pack.chuting.medium'},
             {name:'Chutings - Large',id:'ppr.detail.outbound.pack.chuting.large'},
@@ -107,10 +107,10 @@
             {name:'Pack Singles - Small',id:'ppr.detail.outbound.pack.packSingle.small'},
             {name:'Pack Singles - Medium',id:'ppr.detail.outbound.pack.packSingle.medium'},
             {name:'Pack Singles - Large',id:'ppr.detail.outbound.pack.packSingle.large'},
-            {name:'Pack Singles - Total',id:'ppr.detail.outbound.pack.packSingle.total',b:1},
             {name:'SingleMedium2',frPid:'01002993',frMatch:'Pack Kaizen 1'},
             {name:'SingleMedium',frPid:'01002993',frMatch:'Scan Verify Medium'},
             {name:'SingleNoSLAM',frPid:'01002993',frMatch:'Slam At Pack'},
+            {name:'Pack Singles - Total',id:'ppr.detail.outbound.pack.packSingle.total',b:1},
             {name:'Pack Multis - Small',id:'ppr.detail.outbound.pack.packMultis.small'},
             {name:'Pack Multis - Medium',id:'ppr.detail.outbound.pack.packMultis.medium'},
             {name:'Pack Multis - Large',id:'ppr.detail.outbound.pack.packMultis.large'},
