@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      11.6
+// @version      11.7
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -97,6 +97,8 @@
             {name:'Flow Sort - Medium',id:'ppr.detail.outbound.sort.flowSort.medium'},
             {name:'Flow Sort - Large',id:'ppr.detail.outbound.sort.flowSort.large'},
             {name:'Flow Sort - Total',id:'ppr.detail.outbound.sort.flowSort.total',b:1},
+            {name:'AFE1 Induct',frPid:'01003051',frMatch:'AFE1 Induct'},
+            {name:'AFE 1 Rebin',frPid:'01003051',frMatch:'AFE 1 Rebin'},
             {name:'Chutings - Small',id:'ppr.detail.outbound.pack.chuting.small'},
             {name:'Chutings - Medium',id:'ppr.detail.outbound.pack.chuting.medium'},
             {name:'Chutings - Large',id:'ppr.detail.outbound.pack.chuting.large'},
