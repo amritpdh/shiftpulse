@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      12.9
+// @version      13.0
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -289,7 +289,7 @@
         var total=q.length,done=0,idx=0,act=0;
         function nx(){while(act<CONFIG.maxConcurrent&&idx<q.length){(function(j){act++;
             fP(j.url,function(h){
-                if(h){if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=parseFR(h);}
+                if(!_supDetail[j.di])_supDetail[j.di]={};if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};var parsed=parseFR(h);_supDetail[j.di][j.sn][j.sp]=parsed;if(j.di===0)console.log('[SUP] di='+j.di+' sn='+j.sn+' sp='+j.sp+' funcs='+parsed.length+(parsed.length?(' first='+parsed[0].name+' hrs='+parsed[0].hours):''));
                 else{if(!_supDetail[j.di][j.sn])_supDetail[j.di][j.sn]={};_supDetail[j.di][j.sn][j.sp]=[];}
                 done++;act--;onP({done:done,total:total});
                 if(done>=total)onD();else nx();
