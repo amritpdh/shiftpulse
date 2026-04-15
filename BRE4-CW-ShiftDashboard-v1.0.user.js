@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      14.0
+// @version      14.1
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -1074,7 +1074,7 @@
                     pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';
                         ldB.disabled=false;ldB.textContent='\u21bb Reload';
                         var now=new Date();stB.textContent='\u2705 '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());stB.style.color='#4caf50';
-                        rOverview(tP.ov);rByShift(tP.bs);rCompare(tP.cp);rSnapshot(tP.sn);
+                    console.log('[SP] _supDetail keys:',Object.keys(_supDetail).length,'sample:',_supDetail[0]?Object.keys(_supDetail[0]):'empty');rOverview(tP.ov);rByShift(tP.bs);rCompare(tP.cp);rSnapshot(tP.sn);
                         if(_isScriptReload)_restoreTabState();_isScriptReload=false;});
                     });
                 });
