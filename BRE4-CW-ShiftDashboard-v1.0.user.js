@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      14.6
+// @version      14.8
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -88,7 +88,6 @@
             {name:'Pick - Small',id:'ppr.detail.outbound.pick.pick.small'},
             {name:'Pick - Medium',id:'ppr.detail.outbound.pick.pick.medium'},
             {name:'Pick - Large',id:'ppr.detail.outbound.pick.pick.large'},
-            {name:'Pick - Heavy/Bulky',id:'ppr.detail.outbound.pick.pick.heavyBulky'},
             {name:'RF Pick',frPid:'01003001',frMatch:'RF Pick'},
             {name:'P2R Pick',frPid:'01003001',frMatch:'Pick To Rebin'},
             {name:'Pick - Total',id:'ppr.detail.outbound.pick.pick.total',b:1},
@@ -97,7 +96,6 @@
             {name:'Flow Sort - Small',id:'ppr.detail.outbound.sort.flowSort.small'},
             {name:'Flow Sort - Medium',id:'ppr.detail.outbound.sort.flowSort.medium'},
             {name:'Flow Sort - Large',id:'ppr.detail.outbound.sort.flowSort.large'},
-            {name:'Flow Sort - Heavy/Bulky',id:'ppr.detail.outbound.sort.flowSort.heavyBulky'},
             {name:'AFE1 Induct',frPid:'01003051',frMatch:'AFE1 Induct'},
             {name:'AFE 1 Rebin',frPid:'01003051',frMatch:'AFE 1 Rebin'},
             {name:'Flow Sort - Total',id:'ppr.detail.outbound.sort.flowSort.total',b:1},
@@ -302,7 +300,7 @@
     var _frData={};
     function parseFRRate(html,matchName){var doc=new DOMParser().parseFromString(html,'text/html');var tables=doc.querySelectorAll('table');for(var ti=0;ti<tables.length;ti++){var trs=tables[ti].querySelectorAll('tbody tr');var curF='';for(var r=0;r<trs.length;r++){var th=trs[r].querySelector('th');var tds=trs[r].querySelectorAll('td');if(th){var ht=th.textContent.trim();if(ht&&ht!=='-'&&ht!=='Total')curF=ht;}if(matchName!=='*ALL*'&&curF.toLowerCase().indexOf(matchName.toLowerCase())===-1)continue;if(tds.length>=2&&tds[0].textContent.trim()==='Total'){var hrs=pN(tds[1].textContent.trim());var nums=[];for(var c=2;c<tds.length;c++)nums.push(pN(tds[c].textContent.trim()));var rate=0;for(var ni=3;ni<nums.length;ni+=4){if(nums[ni]>0){rate=nums[ni];break;}}if(!rate){for(var ni2=1;ni2<nums.length;ni2+=2){if(nums[ni2]>0){rate=nums[ni2];break;}}}return{tph:rate,hrs:hrs};}}}return null;}
     function GFR(di,sn,pid,match){var k=di+'_'+sn+'_'+pid;var h=_frData[k];return h?parseFRRate(h,match):null;}
-    function fetchFRData(onP,onD){_frData={};var pids={};for(var s=0;s<OPS.length;s++){for(var it=0;it<OPS[s].items.length;it++){var itm=OPS[s].items[it];if(itm.frPid)pids[itm.frPid]=1;}}var pidList=Object.keys(pids);if(!pidList.length){onD();return;}var q=[];for(var di=0;di<_days.length;di++){var day=_days[di];var sh=shDay(day);for(var si=0;si<sh.length;si++){for(var pi=0;pi<pidList.length;pi++){var url=buildFRUrl(day,sh[si],pidList[pi]);if(url)q.push({di:di,sn:sh[si].name,pid:pidList[pi],url:url});}}}var total=q.length,done=0,idx=0,act=0,fin2=false;if(!total){onD();return;}setTimeout(function(){if(!fin2){fin2=true;onD();}},60000);function fin(){done++;act--;onP(done,total);if(done>=total){if(!fin2){fin2=true;onD();}}else nx();}function nx(){while(act<3&&idx<q.length){(function(j){act++;fP(j.url,function(h){if(h)_frData[j.di+'_'+j.sn+'_'+j.pid]=h;fin();});})(q[idx]);idx++;}}nx();}
+    function fetchFRData(onP,onD){_frData={};var pids={};for(var s=0;s<OPS.length;s++){for(var it=0;it<OPS[s].items.length;it++){var itm=OPS[s].items[it];if(itm.frPid)pids[itm.frPid]=1;}}var pidList=Object.keys(pids);if(!pidList.length){onD();return;}var q=[];for(var di=0;di<_days.length;di++){var day=_days[di];var sh=shDay(day);for(var si=0;si<sh.length;si++){for(var pi=0;pi<pidList.length;pi++){var url=buildFRUrl(day,sh[si],pidList[pi]);if(url)q.push({di:di,sn:sh[si].name,pid:pidList[pi],url:url});}}}var total=q.length,done=0,idx=0,act=0,fin2=false;if(!total){onD();return;}setTimeout(function(){if(!fin2){fin2=true;onD();}},30000);function fin(){done++;act--;onP(done,total);if(done>=total){if(!fin2){fin2=true;onD();}}else nx();}function nx(){while(act<4&&idx<q.length){(function(j){act++;GM_xmlhttpRequest({method:'GET',url:j.url,timeout:10000,onload:function(r){if(r.status===200&&r.responseText)_frData[j.di+'_'+j.sn+'_'+j.pid]=r.responseText;fin();},onerror:function(){fin();},ontimeout:function(){fin();}});})(q[idx]);idx++;}}nx();}
 
     // Ã¢â€â‚¬Ã¢â€â‚¬ UI HELPERS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     var TH='padding:5px 8px;border:1px solid #ccc;color:#222;font-size:0.78em;text-align:center;white-space:nowrap;';
@@ -1052,7 +1050,7 @@
             _tabRegistry=[];_tabIdx=0; // reset tab registry for fresh render
             for(var i=0;i<TABS.length;i++)if(TABS[i].id!=='st')tP[TABS[i].id].innerHTML='';
             // Floating progress bar overlay
-            var pOverlay=el('div','position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(244,245,247,0.92);z-index:50;display:flex;align-items:center;justify-content:center;');
+            var pOverlay=el('div','position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(244,245,247,0.95);z-index:50;display:flex;align-items:center;justify-content:center;');
             var pBarWrap=el('div','text-align:center;width:350px;');
             var pLabel=el('div','color:#555;font-size:0.88em;margin-bottom:8px;font-weight:bold;','\u23f3 Loading...');
             var pBarOuter=el('div','width:100%;height:22px;background:#e0e0e0;border-radius:11px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.1);');
@@ -1060,7 +1058,7 @@
             var pPct=el('div','color:#333;font-size:0.82em;margin-top:6px;font-weight:bold;','0%');
             pBarOuter.appendChild(pBarInner);pBarWrap.appendChild(pLabel);pBarWrap.appendChild(pBarOuter);pBarWrap.appendChild(pPct);
             pOverlay.appendChild(pBarWrap);
-            db.appendChild(pOverlay);
+            cw.style.position='relative';cw.appendChild(pOverlay);
             // Calculate total steps using week days directly
             var wkd=wkDays(_cw,_yr);var pprQ=0;for(var pi=0;pi<wkd.length;pi++){pprQ+=shDay(wkd[pi]).length+1;}
             var supQ=0;for(var si2=0;si2<wkd.length;si2++){var ssh2=shDay(wkd[si2]);for(var sj2=0;sj2<ssh2.length;sj2++)supQ+=SUPS.length;}
