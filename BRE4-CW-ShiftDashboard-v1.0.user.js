@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      15.1
+// @version      15.2
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -995,14 +995,14 @@
 
     // Ã¢â€â‚¬Ã¢â€â‚¬ MAIN PANEL Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     function buildPanel(){
-        var wr=el('div','position:fixed;top:10px;right:10px;z-index:99998;font-family:Arial,sans-serif;font-size:0.92em;');
-        var btn=el('button','padding:8px 18px;border:2px solid #4caf50;border-radius:8px;font-size:0.95em;font-weight:bold;background:#fff;color:#4caf50;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:all 0.2s;','\u26a1 Pulse');
-        btn.title='ShiftPulse - Weekly Dashboard';
-        btn.onmouseenter=function(){btn.style.transform='scale(1.05)';};
-        btn.onmouseleave=function(){btn.style.transform='scale(1)';};
+        var wr=el('div','position:fixed;top:50%;left:0;z-index:999999;font-family:Arial,sans-serif;font-size:0.92em;transform:translateY(-50%);');
+        var btn=el('button','writing-mode:vertical-rl;text-orientation:mixed;padding:14px 8px;border:none;border-radius:0 8px 8px 0;font-size:0.85em;font-weight:bold;background:#4caf50;color:#fff;cursor:pointer;box-shadow:2px 2px 8px rgba(0,0,0,0.3);transition:all 0.2s;letter-spacing:1px;','\u26a1 ShiftPulse');
+
+        btn.onmouseenter=function(){btn.style.paddingLeft='12px';btn.style.boxShadow='4px 2px 12px rgba(76,175,80,0.4)';};
+        btn.onmouseleave=function(){btn.style.paddingLeft='8px';btn.style.boxShadow='2px 2px 8px rgba(0,0,0,0.3)';};
         wr.appendChild(btn);
-        var ov=el('div','display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;');
-        var db=el('div','position:absolute;top:2%;left:2%;width:96%;height:96%;background:#f4f5f7;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.6);display:flex;flex-direction:column;overflow:hidden;');
+        var ov=el('div','display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:9999999;');
+        var db=el('div','position:absolute;top:2%;left:2%;width:96%;height:96%;background:#f4f5f7;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.4);display:flex;flex-direction:column;overflow:hidden;');
         
         // Header
         var hdr=el('div','background:#e8eaed;color:#222;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;flex-wrap:wrap;gap:6px;');
