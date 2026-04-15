@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      16.6
+// @version      16.7
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -442,6 +442,26 @@
     function fmtD(v){return v?(v>0?'+':'')+v.toFixed(2):'-';}
     function fmtAvg(v){return v?v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}):'-';}
     function dayLbl(day,shift){var lbl=DDE[day.getDay()]+' '+fSh(day);if(shift){var sos=pHM(shift.sos),eos=pHM(shift.eos);if(sos&&eos&&(eos.h<sos.h||(eos.h===sos.h&&eos.m<sos.m))){var next=aD(day,1);lbl=DDE[day.getDay()]+' '+fSh(day)+'\u2192'+DDE[next.getDay()]+' '+fSh(next);}}return lbl;}
+    var _popup=null;
+    function showSupPopup(funcName,dayLabel,mgrs,anchorEl){
+        if(_popup){_popup.remove();_popup=null;}
+        if(!mgrs||!mgrs.length)return;
+        var p=el("div","position:fixed;z-index:100000;background:#fff;border:2px solid #4caf50;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.2);padding:14px;min-width:300px;max-width:420px;max-height:400px;overflow-y:auto;font-size:0.88em;");
+        p.appendChild(el("div","font-weight:bold;color:#333;font-size:1em;margin-bottom:2px;",funcName));
+        p.appendChild(el("div","color:#666;font-size:0.82em;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:6px;",dayLabel));
+        var t=el("table","width:100%;border-collapse:collapse;");
+        var thr=el("tr","background:#e8eaed;");thr.appendChild(el("th","padding:5px 8px;text-align:left;border:1px solid #ddd;font-size:0.85em;","Manager"));thr.appendChild(el("th","padding:5px 8px;text-align:right;border:1px solid #ddd;font-size:0.85em;","Total Hours"));t.appendChild(thr);
+        var totalH=0;
+        for(var i=0;i<mgrs.length;i++){totalH+=mgrs[i].hrs;var tr=el("tr","background:"+(i%2===0?"#fff":"#f5f6f8")+";");tr.appendChild(el("td","padding:4px 8px;border:1px solid #ddd;",mgrs[i].name));tr.appendChild(el("td","padding:4px 8px;text-align:right;border:1px solid #ddd;font-weight:bold;",mgrs[i].hrs.toFixed(2)));t.appendChild(tr);}
+        var tfr=el("tr","background:#e8f5e9;font-weight:bold;");tfr.appendChild(el("td","padding:5px 8px;border:1px solid #ddd;","Total"));tfr.appendChild(el("td","padding:5px 8px;text-align:right;border:1px solid #ddd;",totalH.toFixed(2)));t.appendChild(tfr);
+        p.appendChild(t);
+        var cls=el("div","text-align:right;margin-top:8px;");var cb=el("button","padding:4px 14px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;color:#333;cursor:pointer;font-size:0.82em;","Close");
+        cb.onclick=function(){p.remove();_popup=null;};cls.appendChild(cb);p.appendChild(cls);
+        var rect=anchorEl.getBoundingClientRect();
+        p.style.left=Math.min(rect.left,window.innerWidth-440)+"px";p.style.top=Math.min(rect.bottom+4,window.innerHeight-420)+"px";
+        document.body.appendChild(p);_popup=p;
+        setTimeout(function(){document.addEventListener("click",function closer(e){if(_popup&&!_popup.contains(e.target)){_popup.remove();_popup=null;document.removeEventListener("click",closer);}});},100);
+    }
     var _popup=null;
     function showSupPopup(funcName,dayLabel,mgrs,anchorEl){
         if(_popup){_popup.remove();_popup=null;}
