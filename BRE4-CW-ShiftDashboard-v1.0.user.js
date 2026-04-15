@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      15.9
+// @version      16.0
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -996,14 +996,14 @@
     // Ã¢â€â‚¬Ã¢â€â‚¬ MAIN PANEL Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     function buildPanel(){
         var wr=el('div','position:fixed;top:50%;left:0;z-index:999999;font-family:Arial,sans-serif;font-size:0.92em;transform:translateY(-50%);');
-        var btn=el('button','padding:20px 11px;border:none;border-radius:0 10px 10px 0;font-size:1.05em;font-weight:bold;background:#37474f;color:#fff;cursor:grab;box-shadow:2px 2px 10px rgba(0,0,0,0.3);transition:all 0.2s;display:flex;align-items:center;justify-content:center;');var btnTxt=el('span','writing-mode:vertical-rl;letter-spacing:3px;','ShiftPulse');var btnArrow=el('span','font-size:0.8em;margin-top:6px;','\u25B6');btn.appendChild(btnTxt);btn.appendChild(btnArrow);
+        var btn=el('button','padding:16px 11px;border:none;border-radius:0 10px 10px 0;font-size:1.05em;font-weight:bold;background:#37474f;color:#fff;cursor:grab;box-shadow:2px 2px 10px rgba(0,0,0,0.3);transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:4px;');var btnTxt=el('span','writing-mode:vertical-rl;letter-spacing:3px;','ShiftPulse');var btnArrow=el('span','font-size:0.7em;','\u25BC');btn.appendChild(btnTxt);btn.appendChild(btnArrow);
 
 
 
         // Draggable button - sticks to left/right edge, moves up/down, snaps at 50%
         var btnSide='left'; // 'left' or 'right'
         var isDragging=false,dragStartY=0,btnStartTop=0;
-        function updateBtnSide(){if(btnSide==='left'){wr.style.left='0';wr.style.right='auto';btn.style.borderRadius='0 10px 10px 0';btnTxt.style.transform='rotate(0deg)';btnArrow.textContent='\u25B6';}else{wr.style.left='auto';wr.style.right='0';btn.style.borderRadius='10px 0 0 10px';btnTxt.style.transform='rotate(180deg)';btnArrow.textContent='\u25C0';}}
+        function updateBtnSide(){if(btnSide==='left'){wr.style.left='0';wr.style.right='auto';btn.style.borderRadius='0 10px 10px 0';btnTxt.style.transform='rotate(0deg)';btnArrow.textContent='\u25BC';}else{wr.style.left='auto';wr.style.right='0';btn.style.borderRadius='10px 0 0 10px';btnTxt.style.transform='rotate(180deg)';btnArrow.textContent='\u25B2';}}
         updateBtnSide();
         btn.addEventListener('mousedown',function(e){e.preventDefault();isDragging=false;dragStartY=e.clientY;var rect=wr.getBoundingClientRect();btnStartTop=rect.top;
             function onMove(e2){isDragging=true;var newTop=btnStartTop+(e2.clientY-dragStartY);newTop=Math.max(0,Math.min(window.innerHeight-100,newTop));wr.style.top=newTop+'px';wr.style.transform='none';
