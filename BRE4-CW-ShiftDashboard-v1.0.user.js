@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      17.4
+// @version      17.6
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -793,29 +793,29 @@
                 it.appendChild(itb);
                 col(pp2,item2.name,"#aaa",it,false);
             }
+        }
         // Support sections in week overall - collapsible per function
         for(var wsp=0;wsp<SUPS.length;wsp++){
             var wsup=SUPS[wsp],wspp=ppT2.pn['wsup_'+wsp];
             var wAllF={};for(var wdi=0;wdi<_days.length;wdi++){for(var wsn=0;wsn<sn.length;wsn++){var wf=GS(wdi,sn[wsn],wsp);for(var wfi=0;wfi<wf.length;wfi++)wAllF[wf[wfi].name]=1;}}
             var wFNames=Object.keys(wAllF).sort();
-            // Total table (like section total in OPS)
+            // Total collapsible: days as rows, shifts as columns
             var wtt=mT(),wtth=document.createElement('thead'),wthr=el('tr','background:#e8eaed;');
             wthr.appendChild(el('th',TH+'text-align:left;','Day'));
-            for(var wsn2=0;wsn2<sn.length;wsn2++){wthr.appendChild(el('th',TH+'color:#ff9800;border-left:2px solid #999;',sn[wsn2]+' TPH'));wthr.appendChild(el('th',TH+'color:#ff9800;',sn[wsn2]+' \u0394'));}
+            for(var wsn2=0;wsn2<sn.length;wsn2++)wthr.appendChild(el('th',TH+'color:#ff9800;border-left:2px solid #999;',sn[wsn2]+' Hrs'));
             wtth.appendChild(wthr);wtt.appendChild(wtth);
             var wttb=document.createElement('tbody');
             for(var wdi2=0;wdi2<_days.length;wdi2++){var wday=_days[wdi2];
                 var wtr=el('tr','background:'+(wdi2%2===0?'#fff':'#f5f6f8')+';');
                 wtr.appendChild(el('td',TD+'text-align:left;font-weight:bold;',DDE[wday.getDay()]+' '+fSh(wday)));
                 for(var wsn3=0;wsn3<sn.length;wsn3++){var wtot=0;var wf2=GS(wdi2,sn[wsn3],wsp);for(var wfi2=0;wfi2<wf2.length;wfi2++)wtot+=wf2[wfi2].hours;
-                    wtr.appendChild(el('td',TD+'font-weight:bold;border-left:2px solid #999;',wtot?wtot.toFixed(2):'-'));wtr.appendChild(el('td',TD,'-'));}
-                wttb.appendChild(wtr);}
+                    wtr.appendChild(el('td',TD+'font-weight:bold;border-left:2px solid #999;',wtot?wtot.toFixed(2):'-'));}wttb.appendChild(wtr);}
             wtt.appendChild(wttb);col(wspp,wsup.label+' Total',wsup.color,wtt);
-            // Per function collapsible
+            // Per function collapsible: each function gets its own table with days as rows
             for(var wfn=0;wfn<wFNames.length;wfn++){var wfName=wFNames[wfn];
                 var wft=mT(),wfth=document.createElement('thead'),wfhr=el('tr','background:#e8eaed;');
                 wfhr.appendChild(el('th',TH+'text-align:left;','Day'));
-                for(var wsn4=0;wsn4<sn.length;wsn4++){wfhr.appendChild(el('th',TH+'color:#ff9800;border-left:2px solid #999;',sn[wsn4]+' Hrs'));}
+                for(var wsn4=0;wsn4<sn.length;wsn4++)wfhr.appendChild(el('th',TH+'color:#ff9800;border-left:2px solid #999;',sn[wsn4]+' Hrs'));
                 wfth.appendChild(wfhr);wft.appendChild(wfth);
                 var wftb=document.createElement('tbody');
                 for(var wdi3=0;wdi3<_days.length;wdi3++){var wday2=_days[wdi3];
@@ -823,12 +823,9 @@
                     wftr.appendChild(el('td',TD+'text-align:left;font-weight:bold;',DDE[wday2.getDay()]+' '+fSh(wday2)));
                     for(var wsn5=0;wsn5<sn.length;wsn5++){var wf3=GS(wdi3,sn[wsn5],wsp);var wfh=0;for(var wfi3=0;wfi3<wf3.length;wfi3++){if(wf3[wfi3].name===wfName){wfh=wf3[wfi3].hours;break;}}
                         var wCell=el('td',TD+'border-left:2px solid #999;'+(wfh?'cursor:pointer;':''),wfh?wfh.toFixed(2):'-');
-                        if(wfh){(function(cel,fn,di3,sn5,sp5,ds){cel.addEventListener('click',function(ev){ev.stopPropagation();var fd=GS(di3,sn5,sp5);var mg=[];for(var x=0;x<fd.length;x++){if(fd[x].name===fn&&fd[x].mgrs){mg=fd[x].mgrs;break;}}showSupPopup(fn,ds+' ('+sn5+')',mg,cel);});})(wCell,wfName,wdi3,sn[wsn5],wsp,DDE[wday2.getDay()]+' '+fSh(wday2));}
-                        wftr.appendChild(wCell);}
-                    wftb.appendChild(wftr);}
-                wft.appendChild(wftb);col(wspp,wfName,'#aaa',wft,false);
-            }
-        }
+                        if(wfh){(function(cel,fn,di4,sn6,sp6,ds){cel.addEventListener('click',function(ev){ev.stopPropagation();var fd=GS(di4,sn6,sp6);var mg=[];for(var x=0;x<fd.length;x++){if(fd[x].name===fn&&fd[x].mgrs){mg=fd[x].mgrs;break;}}showSupPopup(fn,ds+' ('+sn6+')',mg,cel);});})(wCell,wfName,wdi3,sn[wsn5],wsp,DDE[wday2.getDay()]+' '+fSh(wday2));}
+                        wftr.appendChild(wCell);}wftb.appendChild(wftr);}
+                wft.appendChild(wftb);col(wspp,wfName,'#aaa',wft,false);}
         }
     }
 
