@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      14.9
+// @version      15.0
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -1068,7 +1068,7 @@
                 function(s){pUp('PPR Data',s.done,s.total);stB.textContent='PPR: '+s.done+'/'+s.total;},
                 function(){
                     fetchSupDetail(function(s2){pUp('Support Detail',s2.done,s2.total);stB.textContent='Support: '+s2.done+'/'+s2.total;},function(){
-                    fetchFRData(function(d,t){pLabel.textContent='Rates '+d+'/'+t;},function(){                        pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';setTimeout(function(){if(pOverlay.parentNode)pOverlay.remove();},500);
+                    fetchFRData(function(d,t){grandDone++;var pct=grandTotal?Math.round((grandDone/grandTotal)*100):0;pBarInner.style.width=pct+'%';pPct.textContent=pct+'%';pLabel.textContent='Rates '+d+'/'+t;},function(){                        pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';setTimeout(function(){if(pOverlay.parentNode)pOverlay.remove();},500);
                         ldB.disabled=false;ldB.textContent='\u21bb Reload';
                         var now=new Date();stB.textContent='\u2705 '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());stB.style.color='#4caf50';
                     if(pOverlay.parentNode)pOverlay.remove();rOverview(tP.ov);rByShift(tP.bs);rCompare(tP.cp);rSnapshot(tP.sn);
