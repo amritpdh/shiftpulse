@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      15.4
+// @version      15.5
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -996,14 +996,14 @@
     // Ã¢â€â‚¬Ã¢â€â‚¬ MAIN PANEL Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     function buildPanel(){
         var wr=el('div','position:fixed;top:50%;left:0;z-index:999999;font-family:Arial,sans-serif;font-size:0.92em;transform:translateY(-50%);');
-        var btn=el('button','writing-mode:vertical-rl;text-orientation:mixed;padding:14px 8px;border:none;border-radius:0 8px 8px 0;font-size:0.85em;font-weight:bold;background:#4caf50;color:#fff;cursor:pointer;box-shadow:2px 2px 8px rgba(0,0,0,0.3);transition:all 0.2s;letter-spacing:1px;','\u26a1 ShiftPulse');
+        var btn=el('button','writing-mode:vertical-rl;text-orientation:mixed;padding:18px 10px;border:none;border-radius:0 8px 8px 0;font-size:0.95em;font-weight:bold;background:#4caf50;color:#fff;cursor:grab;box-shadow:2px 2px 8px rgba(0,0,0,0.3);transition:all 0.2s;letter-spacing:2px;','ShiftPulse');
 
 
 
         // Draggable button - sticks to left/right edge, moves up/down, snaps at 50%
         var btnSide='left'; // 'left' or 'right'
         var isDragging=false,dragStartY=0,btnStartTop=0;
-        function updateBtnSide(){if(btnSide==='left'){wr.style.left='0';wr.style.right='auto';btn.style.borderRadius='0 8px 8px 0';}else{wr.style.left='auto';wr.style.right='0';btn.style.borderRadius='8px 0 0 8px';}}
+        function updateBtnSide(){if(btnSide==='left'){wr.style.left='0';wr.style.right='auto';btn.style.borderRadius='0 10px 10px 0';btn.style.writingMode='vertical-rl';btn.style.transform='rotate(0deg)';}else{wr.style.left='auto';wr.style.right='0';btn.style.borderRadius='10px 0 0 10px';btn.style.writingMode='vertical-lr';btn.style.transform='rotate(180deg)';}}
         updateBtnSide();
         btn.addEventListener('mousedown',function(e){e.preventDefault();isDragging=false;dragStartY=e.clientY;var rect=wr.getBoundingClientRect();btnStartTop=rect.top;
             function onMove(e2){isDragging=true;var newTop=btnStartTop+(e2.clientY-dragStartY);newTop=Math.max(0,Math.min(window.innerHeight-100,newTop));wr.style.top=newTop+'px';wr.style.transform='none';
