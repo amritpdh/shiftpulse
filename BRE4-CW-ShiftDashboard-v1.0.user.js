@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      16.5
+// @version      16.6
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -1084,9 +1084,9 @@
         }
         ldB.onclick=doLoad;
         csB.onclick=function(){exportCsv();};
-        pB.onclick=function(){_cw--;if(_cw<1){_cw=52;_yr--;}sync();doLoad();};
-        nB.onclick=function(){_cw++;if(_cw>52){_cw=1;_yr++;}sync();doLoad();};
-        tB.onclick=function(){_cw=isoWk(new Date());_yr=isoYr(new Date());sync();doLoad();};
+        pB.onclick=function(){_cw--;if(_cw<1){_cw=52;_yr--;}sync();};
+        nB.onclick=function(){_cw++;if(_cw>52){_cw=1;_yr++;}sync();};
+        tB.onclick=function(){_cw=isoWk(new Date());_yr=isoYr(new Date());sync();};
         // Draggable button - sticks to left/right edge, moves up/down, snaps at 50%
         var btnSide='left'; // 'left' or 'right'
         var isDragging=false,dragStartY=0,btnStartTop=0;
