@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      16.4
+// @version      16.5
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -1018,7 +1018,7 @@
         var yrI=el('input','width:52px;padding:2px 4px;border:1px solid #bbb;border-radius:4px;background:#e8eaed;color:#222;text-align:center;font-size:0.8em;');yrI.type='number';yrI.value=_yr;
         var pB=el('button','padding:2px 8px;border:1px solid #bbb;border-radius:4px;background:#e8eaed;color:#333;cursor:pointer;font-size:0.78em;','\u25C0');
         var nB=el('button','padding:2px 8px;border:1px solid #bbb;border-radius:4px;background:#e8eaed;color:#333;cursor:pointer;font-size:0.78em;','\u25B6');
-        var tB=el('button','padding:2px 8px;border:1px solid #4caf50;border-radius:4px;background:#e8f5e9;color:#4caf50;cursor:pointer;font-size:0.78em;font-weight:bold;','Today');
+        var tB=el('button','padding:2px 8px;border:1px solid #4caf50;border-radius:4px;background:#e8f5e9;color:#4caf50;cursor:pointer;font-size:0.78em;font-weight:bold;','Current Week');
         nav.appendChild(cwI);nav.appendChild(yrI);nav.appendChild(pB);nav.appendChild(tB);nav.appendChild(nB);
         hdr.appendChild(nav);
         var bts=el('div','display:flex;gap:4px;align-items:center;');
