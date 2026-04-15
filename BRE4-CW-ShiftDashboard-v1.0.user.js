@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      16.7
+// @version      17.1
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -446,7 +446,7 @@
     function showSupPopup(funcName,dayLabel,mgrs,anchorEl){
         if(_popup){_popup.remove();_popup=null;}
         if(!mgrs||!mgrs.length)return;
-        var p=el("div","position:fixed;z-index:100000;background:#fff;border:2px solid #4caf50;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.2);padding:14px;min-width:300px;max-width:420px;max-height:400px;overflow-y:auto;font-size:0.88em;");
+        var p=el("div","position:fixed;z-index:99999999;background:#fff;border:2px solid #4caf50;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.2);padding:14px;min-width:300px;max-width:420px;max-height:400px;overflow-y:auto;font-size:0.88em;");
         p.appendChild(el("div","font-weight:bold;color:#333;font-size:1em;margin-bottom:2px;",funcName));
         p.appendChild(el("div","color:#666;font-size:0.82em;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:6px;",dayLabel));
         var t=el("table","width:100%;border-collapse:collapse;");
@@ -462,11 +462,11 @@
         document.body.appendChild(p);_popup=p;
         setTimeout(function(){document.addEventListener("click",function closer(e){if(_popup&&!_popup.contains(e.target)){_popup.remove();_popup=null;document.removeEventListener("click",closer);}});},100);
     }
-    var _popup=null;
+
     function showSupPopup(funcName,dayLabel,mgrs,anchorEl){
         if(_popup){_popup.remove();_popup=null;}
         if(!mgrs||!mgrs.length)return;
-        var p=el("div","position:fixed;z-index:100000;background:#fff;border:2px solid #4caf50;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.2);padding:14px;min-width:300px;max-width:420px;max-height:400px;overflow-y:auto;font-size:0.88em;");
+        var p=el("div","position:fixed;z-index:99999999;background:#fff;border:2px solid #4caf50;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.2);padding:14px;min-width:300px;max-width:420px;max-height:400px;overflow-y:auto;font-size:0.88em;");
         p.appendChild(el("div","font-weight:bold;color:#333;font-size:1em;margin-bottom:2px;",funcName));
         p.appendChild(el("div","color:#666;font-size:0.82em;margin-bottom:10px;border-bottom:1px solid #ddd;padding-bottom:6px;",dayLabel));
         var t=el("table","width:100%;border-collapse:collapse;");
@@ -675,7 +675,7 @@
         dailyP.appendChild(dayT.el);
         for(var dk=0;dk<dayDefs.length;dk++){
             var dd=dayDefs[dk],dp=dayT.pn["d"+dd.di];
-            var ppT=tabs(OPS.map(function(s){return{id:s.label,label:s.label};}),3);
+            var ppDefs2=OPS.map(function(s){return{id:s.label,label:s.label};});for(var sp9=0;sp9<SUPS.length;sp9++)ppDefs2.push({id:'csup_'+sp9,label:SUPS[sp9].label});var ppT=tabs(ppDefs2,3);
             dp.appendChild(ppT.el);
             for(var sec=0;sec<OPS.length;sec++){
                 var section=OPS[sec],pp=ppT.pn[section.label];
@@ -710,11 +710,32 @@
                 }
                 t.appendChild(tb);var sw=el("div","overflow-x:auto;");sw.appendChild(t);pp.appendChild(sw);
             }
+            // Support sections in daily comparison
+            for(var csp=0;csp<SUPS.length;csp++){
+                var csup=SUPS[csp],cspp=ppT.pn['csup_'+csp];
+                var cst=mT(),csth=document.createElement('thead');
+                var cshr=el('tr','background:#e8eaed;');
+                cshr.appendChild(el('th',TH+'text-align:left;min-width:150px;position:sticky;left:0;background:#e8eaed;z-index:1;','Function'));
+                for(var csi=0;csi<dd.shifts.length;csi++){cshr.appendChild(el('th',TH+'border-left:2px solid #999;color:#ff9800;',dd.shifts[csi].name+' Hrs'));}
+                csth.appendChild(cshr);cst.appendChild(csth);
+                var cstb=document.createElement('tbody');
+                // Get all function names across shifts
+                var cAllF={};for(var csi2=0;csi2<dd.shifts.length;csi2++){var cf=GS(dd.di,dd.shifts[csi2].name,csp);for(var cfi=0;cfi<cf.length;cfi++)cAllF[cf[cfi].name]=1;}
+                var cFNames=Object.keys(cAllF).sort();
+                for(var cfn=0;cfn<cFNames.length;cfn++){
+                    var cfName=cFNames[cfn];
+                    var cftr=el('tr','background:'+(cfn%2===0?'#fff':'#f5f6f8')+';');
+                    cftr.appendChild(el('td',TD+'text-align:left;padding-left:14px;position:sticky;left:0;background:'+(cfn%2===0?'#fff':'#f5f6f8')+';z-index:1;',cfName));
+                    for(var csi3=0;csi3<dd.shifts.length;csi3++){var cf2=GS(dd.di,dd.shifts[csi3].name,csp);var ch=0;for(var cfi2=0;cfi2<cf2.length;cfi2++){if(cf2[cfi2].name===cfName){ch=cf2[cfi2].hours;break;}}
+                        cftr.appendChild(el('td',TD+'border-left:2px solid #999;',ch?ch.toFixed(2):'-'));}
+                    cstb.appendChild(cftr);}
+                cst.appendChild(cstb);cspp.appendChild(cst);
+            }
         }
 
         // === WEEK OVERALL: PP tabs -> table with shifts as columns, days as rows + avg ===
         var weekP=topT.pn.weekly;
-        var ppT2=tabs(OPS.map(function(s){return{id:s.label,label:s.label};}),2);
+        var ppDefs3=OPS.map(function(s){return{id:s.label,label:s.label};});for(var sp10=0;sp10<SUPS.length;sp10++)ppDefs3.push({id:'wsup_'+sp10,label:SUPS[sp10].label});var ppT2=tabs(ppDefs3,2);
         weekP.appendChild(ppT2.el);
         for(var sec2=0;sec2<OPS.length;sec2++){
             var section2=OPS[sec2],pp2=ppT2.pn[section2.label];
@@ -772,6 +793,22 @@
                 it.appendChild(itb);
                 col(pp2,item2.name,"#aaa",it,false);
             }
+        // Support sections in week overall
+        for(var wsp=0;wsp<SUPS.length;wsp++){
+            var wsup=SUPS[wsp],wspp=ppT2.pn['wsup_'+wsp];
+            var wst=mT(),wsth=document.createElement('thead'),wshr=el('tr','background:#e8eaed;');
+            wshr.appendChild(el('th',TH+'text-align:left;','Day'));
+            for(var wsn=0;wsn<sn.length;wsn++){wshr.appendChild(el('th',TH+'color:#ff9800;border-left:2px solid #999;',sn[wsn]+' Hrs'));}
+            wsth.appendChild(wshr);wst.appendChild(wsth);
+            var wstb=document.createElement('tbody');
+            for(var wdi=0;wdi<_days.length;wdi++){var wday=_days[wdi];
+                var wtr=el('tr','background:'+(wdi%2===0?'#fff':'#f5f6f8')+';');
+                wtr.appendChild(el('td',TD+'text-align:left;font-weight:bold;',DDE[wday.getDay()]+' '+fSh(wday)));
+                for(var wsn2=0;wsn2<sn.length;wsn2++){var wf=GS(wdi,sn[wsn2],wsp);var wh=0;for(var wfi=0;wfi<wf.length;wfi++)wh+=wf[wfi].hours;
+                    wtr.appendChild(el('td',TD+'border-left:2px solid #999;',wh?wh.toFixed(2):'-'));}
+                wstb.appendChild(wtr);}
+            wst.appendChild(wstb);wspp.appendChild(wst);
+        }
         }
     }
 
@@ -1064,7 +1101,7 @@
         for(var j=0;j<TABS.length;j++)cw.appendChild(tP[TABS[j].id]);
         db.appendChild(cw);ov.appendChild(db);
         ov.onclick=function(e){if(e.target===ov)ov.style.display='none';};
-        document.body.appendChild(ov);wr.appendChild(ov);document.body.appendChild(wr);
+        document.body.appendChild(ov);document.body.appendChild(wr);
 
         function sync(){cwI.value=_cw;yrI.value=_yr;kwB.textContent='Week '+_cw;fcB.textContent=CONFIG.warehouseId;}
         function doLoad(){
