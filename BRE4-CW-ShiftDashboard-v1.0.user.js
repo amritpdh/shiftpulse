@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      17.1
+// @version      17.3
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -727,7 +727,7 @@
                     var cftr=el('tr','background:'+(cfn%2===0?'#fff':'#f5f6f8')+';');
                     cftr.appendChild(el('td',TD+'text-align:left;padding-left:14px;position:sticky;left:0;background:'+(cfn%2===0?'#fff':'#f5f6f8')+';z-index:1;',cfName));
                     for(var csi3=0;csi3<dd.shifts.length;csi3++){var cf2=GS(dd.di,dd.shifts[csi3].name,csp);var ch=0;for(var cfi2=0;cfi2<cf2.length;cfi2++){if(cf2[cfi2].name===cfName){ch=cf2[cfi2].hours;break;}}
-                        cftr.appendChild(el('td',TD+'border-left:2px solid #999;',ch?ch.toFixed(2):'-'));}
+                        var cCell=el('td',TD+'border-left:2px solid #999;'+(ch?'cursor:pointer;':''),ch?ch.toFixed(2):'-');if(ch){(function(cel,fn,di2,sn2,sp2,ds){cel.addEventListener('click',function(ev){ev.stopPropagation();var fd=GS(di2,sn2,sp2);var mg=[];for(var x=0;x<fd.length;x++){if(fd[x].name===fn&&fd[x].mgrs){mg=fd[x].mgrs;break;}}showSupPopup(fn,ds+' ('+sn2+')',mg,cel);});})(cCell,cfName,dd.di,dd.shifts[csi3].name,csp,DDE[dd.day.getDay()]+' '+fSh(dd.day));}cftr.appendChild(cCell);}
                     cstb.appendChild(cftr);}
                 cst.appendChild(cstb);cspp.appendChild(cst);
             }
@@ -793,21 +793,33 @@
                 it.appendChild(itb);
                 col(pp2,item2.name,"#aaa",it,false);
             }
-        // Support sections in week overall
+        // Support sections in week overall - with sub-functions and clickable cells
         for(var wsp=0;wsp<SUPS.length;wsp++){
             var wsup=SUPS[wsp],wspp=ppT2.pn['wsup_'+wsp];
+            // Collect all function names across all days/shifts
+            var wAllF={};for(var wdi=0;wdi<_days.length;wdi++){for(var wsn=0;wsn<sn.length;wsn++){var wf=GS(wdi,sn[wsn],wsp);for(var wfi=0;wfi<wf.length;wfi++)wAllF[wf[wfi].name]=1;}}
+            var wFNames=Object.keys(wAllF).sort();
             var wst=mT(),wsth=document.createElement('thead'),wshr=el('tr','background:#e8eaed;');
-            wshr.appendChild(el('th',TH+'text-align:left;','Day'));
-            for(var wsn=0;wsn<sn.length;wsn++){wshr.appendChild(el('th',TH+'color:#ff9800;border-left:2px solid #999;',sn[wsn]+' Hrs'));}
+            wshr.appendChild(el('th',TH+'text-align:left;min-width:150px;position:sticky;left:0;background:#e8eaed;z-index:1;','Function'));
+            for(var wsn2=0;wsn2<sn.length;wsn2++){wshr.appendChild(el('th',TH+'color:#ff9800;border-left:2px solid #999;',sn[wsn2]+' Hrs'));}
             wsth.appendChild(wshr);wst.appendChild(wsth);
             var wstb=document.createElement('tbody');
-            for(var wdi=0;wdi<_days.length;wdi++){var wday=_days[wdi];
-                var wtr=el('tr','background:'+(wdi%2===0?'#fff':'#f5f6f8')+';');
-                wtr.appendChild(el('td',TD+'text-align:left;font-weight:bold;',DDE[wday.getDay()]+' '+fSh(wday)));
-                for(var wsn2=0;wsn2<sn.length;wsn2++){var wf=GS(wdi,sn[wsn2],wsp);var wh=0;for(var wfi=0;wfi<wf.length;wfi++)wh+=wf[wfi].hours;
-                    wtr.appendChild(el('td',TD+'border-left:2px solid #999;',wh?wh.toFixed(2):'-'));}
-                wstb.appendChild(wtr);}
-            wst.appendChild(wstb);wspp.appendChild(wst);
+            // Per day, per function, per shift
+            for(var wdi2=0;wdi2<_days.length;wdi2++){var wday=_days[wdi2];
+                // Day header row
+                var wdhr=el('tr','background:#e3f2fd;');wdhr.appendChild(el('td',TD+'text-align:left;font-weight:bold;position:sticky;left:0;background:#e3f2fd;z-index:1;',DDE[wday.getDay()]+' '+fSh(wday)));
+                for(var wsn3=0;wsn3<sn.length;wsn3++){var wtot=0;var wf2=GS(wdi2,sn[wsn3],wsp);for(var wfi2=0;wfi2<wf2.length;wfi2++)wtot+=wf2[wfi2].hours;wdhr.appendChild(el('td',TD+'font-weight:bold;border-left:2px solid #999;',wtot?wtot.toFixed(2):'-'));}wstb.appendChild(wdhr);
+                // Function rows for this day
+                for(var wfn=0;wfn<wFNames.length;wfn++){var wfName=wFNames[wfn];
+                    var wftr=el('tr','background:'+(wfn%2===0?'#fff':'#f5f6f8')+';');
+                    wftr.appendChild(el('td',TD+'text-align:left;padding-left:14px;position:sticky;left:0;background:'+(wfn%2===0?'#fff':'#f5f6f8')+';z-index:1;',wfName));
+                    for(var wsn4=0;wsn4<sn.length;wsn4++){var wf3=GS(wdi2,sn[wsn4],wsp);var wfh=0;for(var wfi3=0;wfi3<wf3.length;wfi3++){if(wf3[wfi3].name===wfName){wfh=wf3[wfi3].hours;break;}}
+                        var wCell=el('td',TD+'border-left:2px solid #999;'+(wfh?'cursor:pointer;':''),wfh?wfh.toFixed(2):'-');
+                        if(wfh){(function(cel,fn,di3,sn5,sp5,ds){cel.addEventListener('click',function(ev){ev.stopPropagation();var fd=GS(di3,sn5,sp5);var mg=[];for(var x=0;x<fd.length;x++){if(fd[x].name===fn&&fd[x].mgrs){mg=fd[x].mgrs;break;}}showSupPopup(fn,ds+' ('+sn5+')',mg,cel);});})(wCell,wfName,wdi2,sn[wsn4],wsp,DDE[wday.getDay()]+' '+fSh(wday));}
+                        wftr.appendChild(wCell);}
+                    wstb.appendChild(wftr);}
+            }
+            wst.appendChild(wstb);var wsw=el('div','overflow-x:auto;');wsw.appendChild(wst);wspp.appendChild(wsw);
         }
         }
     }
