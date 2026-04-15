@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      14.4
+// @version      14.5
 // @description  Weekly shift-wise PPR dashboard
 // @author       hardejb
 // @match        https://fclm-portal.amazon.com/reports/processPathRollup*
@@ -1049,24 +1049,26 @@
             stB.textContent='Fetching...';stB.style.color='#ff9800';
             _tabRegistry=[];_tabIdx=0; // reset tab registry for fresh render
             for(var i=0;i<TABS.length;i++)if(TABS[i].id!=='st')tP[TABS[i].id].innerHTML='';
-            // Progress bar
-            var pBarWrap=el('div','margin:20px auto;max-width:400px;text-align:center;');
+            // Floating progress bar overlay
+            var pOverlay=el('div','position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(244,245,247,0.92);z-index:50;display:flex;align-items:center;justify-content:center;');
+            var pBarWrap=el('div','text-align:center;width:350px;');
             var pLabel=el('div','color:#555;font-size:0.88em;margin-bottom:8px;font-weight:bold;','\u23f3 Loading...');
             var pBarOuter=el('div','width:100%;height:22px;background:#e0e0e0;border-radius:11px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.1);');
             var pBarInner=el('div','width:0%;height:100%;background:linear-gradient(90deg,#4caf50,#66bb6a);border-radius:11px;transition:width 0.2s;');
             var pPct=el('div','color:#333;font-size:0.82em;margin-top:6px;font-weight:bold;','0%');
             pBarOuter.appendChild(pBarInner);pBarWrap.appendChild(pLabel);pBarWrap.appendChild(pBarOuter);pBarWrap.appendChild(pPct);
-            tP.ov.appendChild(pBarWrap);
+            pOverlay.appendChild(pBarWrap);
+            db.appendChild(pOverlay);
             // Calculate total steps using week days directly
             var wkd=wkDays(_cw,_yr);var pprQ=0;for(var pi=0;pi<wkd.length;pi++){pprQ+=shDay(wkd[pi]).length+1;}
             var supQ=0;for(var si2=0;si2<wkd.length;si2++){var ssh2=shDay(wkd[si2]);for(var sj2=0;sj2<ssh2.length;sj2++)supQ+=SUPS.length;}
-            var grandTotal=pprQ+supQ,grandDone=0;
+            var frPids2={};for(var fp=0;fp<OPS.length;fp++){for(var fi2=0;fi2<OPS[fp].items.length;fi2++){if(OPS[fp].items[fi2].frPid)frPids2[OPS[fp].items[fi2].frPid]=1;}}var frQ=Object.keys(frPids2).length;var frTotal=0;for(var fw=0;fw<wkd.length;fw++)frTotal+=shDay(wkd[fw]).length*frQ;var grandTotal=pprQ+supQ+frTotal,grandDone=0;
             function pUp(label,done,total){grandDone++;var pct=grandTotal?Math.round((grandDone/grandTotal)*100):0;pBarInner.style.width=pct+'%';pPct.textContent=pct+'%';pLabel.textContent=label+' '+done+'/'+total;}
             fetchAll(
                 function(s){pUp('PPR Data',s.done,s.total);stB.textContent='PPR: '+s.done+'/'+s.total;},
                 function(){
                     fetchSupDetail(function(s2){pUp('Support Detail',s2.done,s2.total);stB.textContent='Support: '+s2.done+'/'+s2.total;},function(){
-                    fetchFRData(function(d,t){pLabel.textContent='Rates '+d+'/'+t;},function(){                        pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';
+                    fetchFRData(function(d,t){pLabel.textContent='Rates '+d+'/'+t;},function(){                        pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';setTimeout(function(){if(pOverlay.parentNode)pOverlay.remove();},500);
                         ldB.disabled=false;ldB.textContent='\u21bb Reload';
                         var now=new Date();stB.textContent='\u2705 '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());stB.style.color='#4caf50';
                         rOverview(tP.ov);rByShift(tP.bs);rCompare(tP.cp);rSnapshot(tP.sn);
