@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      15.3
+// @version      15.4
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -1000,14 +1000,17 @@
 
 
 
-        // Draggable button
-        var isDragging=false,dragStartX=0,dragStartY=0,btnStartX=0,btnStartY=0;
-        btn.addEventListener('mousedown',function(e){isDragging=false;dragStartX=e.clientX;dragStartY=e.clientY;var rect=wr.getBoundingClientRect();btnStartX=rect.left;btnStartY=rect.top;
-            function onMove(e2){var dx=e2.clientX-dragStartX,dy=e2.clientY-dragStartY;if(Math.abs(dx)>3||Math.abs(dy)>3)isDragging=true;wr.style.left=(btnStartX+dx)+'px';wr.style.top=(btnStartY+dy)+'px';wr.style.transform='none';}
+        // Draggable button - sticks to left/right edge, moves up/down, snaps at 50%
+        var btnSide='left'; // 'left' or 'right'
+        var isDragging=false,dragStartY=0,btnStartTop=0;
+        function updateBtnSide(){if(btnSide==='left'){wr.style.left='0';wr.style.right='auto';btn.style.borderRadius='0 8px 8px 0';}else{wr.style.left='auto';wr.style.right='0';btn.style.borderRadius='8px 0 0 8px';}}
+        updateBtnSide();
+        btn.addEventListener('mousedown',function(e){e.preventDefault();isDragging=false;dragStartY=e.clientY;var rect=wr.getBoundingClientRect();btnStartTop=rect.top;
+            function onMove(e2){isDragging=true;var newTop=btnStartTop+(e2.clientY-dragStartY);newTop=Math.max(0,Math.min(window.innerHeight-100,newTop));wr.style.top=newTop+'px';wr.style.transform='none';
+                var mid=window.innerWidth/2;if(e2.clientX>mid&&btnSide==='left'){btnSide='right';updateBtnSide();}else if(e2.clientX<=mid&&btnSide==='right'){btnSide='left';updateBtnSide();}}
             function onUp(){document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);if(!isDragging){ov.style.display='block';swT('ov');}}
-            document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
-        });
-        btn.style.cursor='grab';btn.addEventListener('mousedown',function(){btn.style.cursor='grabbing';});btn.addEventListener('mouseup',function(){btn.style.cursor='grab';});
+            document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);});
+        btn.style.cursor='grab';
         wr.appendChild(btn);
         var ov=el('div','display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:9999999;');
         var db=el('div','position:absolute;top:2%;left:2%;width:96%;height:96%;background:#f4f5f7;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.4);display:flex;flex-direction:column;overflow:hidden;');
