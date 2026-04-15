@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      16.3
+// @version      16.4
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -996,7 +996,7 @@
     // Ã¢â€â‚¬Ã¢â€â‚¬ MAIN PANEL Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     function buildPanel(){
         var wr=el('div','position:fixed;top:50%;left:0;z-index:999999;font-family:Arial,sans-serif;font-size:0.92em;transform:translateY(-50%);');
-        var btn=el('button','padding:16px 11px;border:none;border-radius:0 10px 10px 0;font-size:1.05em;font-weight:bold;background:#37474f;color:#fff;cursor:grab;box-shadow:2px 2px 10px rgba(0,0,0,0.3);transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:4px;');var btnTxt=el('span','writing-mode:vertical-rl;letter-spacing:3px;','Weekly Dashboard');var btnArrow=el('span','font-size:0.7em;','\u25BC');btn.appendChild(btnTxt);btn.appendChild(btnArrow);
+        var btn=el('button','padding:16px 11px;border:none;border-radius:0 10px 10px 0;font-size:1.05em;font-weight:bold;background:#37474f;color:#fff;cursor:grab;box-shadow:2px 2px 10px rgba(0,0,0,0.3);transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:4px;');var btnTxt=el('span','writing-mode:vertical-rl;letter-spacing:3px;','Weekly Dashboard');var btnArrow=el('span','font-size:1.2em;margin-top:8px;','\u25BC');btn.appendChild(btnTxt);btn.appendChild(btnArrow);
 
 
 
