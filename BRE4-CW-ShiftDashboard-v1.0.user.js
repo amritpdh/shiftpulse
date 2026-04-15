@@ -1,9 +1,11 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      14.5
+// @version      14.6
 // @description  Weekly shift-wise PPR dashboard
-// @author       hardejb
+// @author       BRE4
+// @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
+// @downloadURL  https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
 // @match        https://fclm-portal.amazon.com/reports/processPathRollup*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_openInTab
