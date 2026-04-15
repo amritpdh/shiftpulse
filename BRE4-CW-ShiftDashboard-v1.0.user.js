@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      15.2
+// @version      15.3
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -998,8 +998,16 @@
         var wr=el('div','position:fixed;top:50%;left:0;z-index:999999;font-family:Arial,sans-serif;font-size:0.92em;transform:translateY(-50%);');
         var btn=el('button','writing-mode:vertical-rl;text-orientation:mixed;padding:14px 8px;border:none;border-radius:0 8px 8px 0;font-size:0.85em;font-weight:bold;background:#4caf50;color:#fff;cursor:pointer;box-shadow:2px 2px 8px rgba(0,0,0,0.3);transition:all 0.2s;letter-spacing:1px;','\u26a1 ShiftPulse');
 
-        btn.onmouseenter=function(){btn.style.paddingLeft='12px';btn.style.boxShadow='4px 2px 12px rgba(76,175,80,0.4)';};
-        btn.onmouseleave=function(){btn.style.paddingLeft='8px';btn.style.boxShadow='2px 2px 8px rgba(0,0,0,0.3)';};
+
+
+        // Draggable button
+        var isDragging=false,dragStartX=0,dragStartY=0,btnStartX=0,btnStartY=0;
+        btn.addEventListener('mousedown',function(e){isDragging=false;dragStartX=e.clientX;dragStartY=e.clientY;var rect=wr.getBoundingClientRect();btnStartX=rect.left;btnStartY=rect.top;
+            function onMove(e2){var dx=e2.clientX-dragStartX,dy=e2.clientY-dragStartY;if(Math.abs(dx)>3||Math.abs(dy)>3)isDragging=true;wr.style.left=(btnStartX+dx)+'px';wr.style.top=(btnStartY+dy)+'px';wr.style.transform='none';}
+            function onUp(){document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);if(!isDragging){ov.style.display='block';swT('ov');}}
+            document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+        });
+        btn.style.cursor='grab';btn.addEventListener('mousedown',function(){btn.style.cursor='grabbing';});btn.addEventListener('mouseup',function(){btn.style.cursor='grab';});
         wr.appendChild(btn);
         var ov=el('div','display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:9999999;');
         var db=el('div','position:absolute;top:2%;left:2%;width:96%;height:96%;background:#f4f5f7;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.4);display:flex;flex-direction:column;overflow:hidden;');
@@ -1087,7 +1095,7 @@
         pB.onclick=function(){_cw--;if(_cw<1){_cw=52;_yr--;}sync();doLoad();};
         nB.onclick=function(){_cw++;if(_cw>52){_cw=1;_yr++;}sync();doLoad();};
         tB.onclick=function(){_cw=isoWk(new Date());_yr=isoYr(new Date());sync();doLoad();};
-        btn.onclick=function(){ov.style.display='block';swT('ov');localStorage.setItem('sp_open','1');};
+        // btn click handled by drag handler above
 
         // On full page load: don't auto-restore, start fresh
         // Only remember that dashboard was open (for convenience)
