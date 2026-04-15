@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      16.2
+// @version      16.3
 // @description  Weekly shift-wise PPR dashboard
 // @author       BRE4
 // @updateURL    https://raw.githubusercontent.com/amritpdh/shiftpulse/main/BRE4-CW-ShiftDashboard-v1.0.user.js
@@ -1000,17 +1000,6 @@
 
 
 
-        // Draggable button - sticks to left/right edge, moves up/down, snaps at 50%
-        var btnSide='left'; // 'left' or 'right'
-        var isDragging=false,dragStartY=0,btnStartTop=0;
-        function updateBtnSide(){if(btnSide==='left'){wr.style.left='0';wr.style.right='auto';btn.style.borderRadius='0 10px 10px 0';btnTxt.style.transform='rotate(0deg)';btnArrow.textContent='\u25B6';}else{wr.style.left='auto';wr.style.right='0';btn.style.borderRadius='10px 0 0 10px';btnTxt.style.transform='rotate(180deg)';btnArrow.textContent='\u25C0';}}
-        updateBtnSide();
-        btn.addEventListener('mousedown',function(e){e.preventDefault();isDragging=false;dragStartY=e.clientY;var rect=wr.getBoundingClientRect();btnStartTop=rect.top;
-            function onMove(e2){isDragging=true;var newTop=btnStartTop+(e2.clientY-dragStartY);newTop=Math.max(0,Math.min(window.innerHeight-100,newTop));wr.style.top=newTop+'px';wr.style.transform='none';
-                var mid=window.innerWidth/2;if(e2.clientX>mid&&btnSide==='left'){btnSide='right';updateBtnSide();}else if(e2.clientX<=mid&&btnSide==='right'){btnSide='left';updateBtnSide();}}
-            function onUp(){document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);if(!isDragging){ov.style.display='block';swT('ov');}}
-            document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);});
-        btn.style.cursor='grab';
         wr.appendChild(btn);
         var ov=el('div','display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:9999999;');
         var db=el('div','position:absolute;top:2%;left:2%;width:96%;height:96%;background:#f4f5f7;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.4);display:flex;flex-direction:column;overflow:hidden;');
@@ -1098,7 +1087,17 @@
         pB.onclick=function(){_cw--;if(_cw<1){_cw=52;_yr--;}sync();doLoad();};
         nB.onclick=function(){_cw++;if(_cw>52){_cw=1;_yr++;}sync();doLoad();};
         tB.onclick=function(){_cw=isoWk(new Date());_yr=isoYr(new Date());sync();doLoad();};
-        // btn click handled by drag handler above
+        // Draggable button - sticks to left/right edge, moves up/down, snaps at 50%
+        var btnSide='left'; // 'left' or 'right'
+        var isDragging=false,dragStartY=0,btnStartTop=0;
+        function updateBtnSide(){if(btnSide==='left'){wr.style.left='0';wr.style.right='auto';btn.style.borderRadius='0 10px 10px 0';btnTxt.style.transform='rotate(0deg)';btnArrow.textContent='\u25B6';}else{wr.style.left='auto';wr.style.right='0';btn.style.borderRadius='10px 0 0 10px';btnTxt.style.transform='rotate(180deg)';btnArrow.textContent='\u25C0';}}
+        updateBtnSide();
+        btn.addEventListener('mousedown',function(e){e.preventDefault();isDragging=false;dragStartY=e.clientY;var rect=wr.getBoundingClientRect();btnStartTop=rect.top;
+            function onMove(e2){isDragging=true;var newTop=btnStartTop+(e2.clientY-dragStartY);newTop=Math.max(0,Math.min(window.innerHeight-100,newTop));wr.style.top=newTop+'px';wr.style.transform='none';
+                var mid=window.innerWidth/2;if(e2.clientX>mid&&btnSide==='left'){btnSide='right';updateBtnSide();}else if(e2.clientX<=mid&&btnSide==='right'){btnSide='left';updateBtnSide();}}
+            function onUp(){document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);if(!isDragging){ov.style.display='block';swT('ov');}}
+            document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);});
+        btn.style.cursor='grab';
 
         // On full page load: don't auto-restore, start fresh
         // Only remember that dashboard was open (for convenience)
