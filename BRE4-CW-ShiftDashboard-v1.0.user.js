@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShiftPulse - Weekly Performance Dashboard
 // @namespace    http://tampermonkey.net/
-// @version      14.3
+// @version      14.4
 // @description  Weekly shift-wise PPR dashboard
 // @author       hardejb
 // @match        https://fclm-portal.amazon.com/reports/processPathRollup*
@@ -87,6 +87,8 @@
             {name:'Pick - Medium',id:'ppr.detail.outbound.pick.pick.medium'},
             {name:'Pick - Large',id:'ppr.detail.outbound.pick.pick.large'},
             {name:'Pick - Heavy/Bulky',id:'ppr.detail.outbound.pick.pick.heavyBulky'},
+            {name:'RF Pick',frPid:'01003001',frMatch:'RF Pick'},
+            {name:'P2R Pick',frPid:'01003001',frMatch:'Pick To Rebin'},
             {name:'Pick - Total',id:'ppr.detail.outbound.pick.pick.total',b:1},
             {name:'Pick Support',id:'ppr.detail.outbound.pick.pickSupport'},
             {name:'Pick Total (Incl. Support)',id:'ppr.detail.outbound.pick.pick.grossTotal',b:1},
@@ -94,6 +96,8 @@
             {name:'Flow Sort - Medium',id:'ppr.detail.outbound.sort.flowSort.medium'},
             {name:'Flow Sort - Large',id:'ppr.detail.outbound.sort.flowSort.large'},
             {name:'Flow Sort - Heavy/Bulky',id:'ppr.detail.outbound.sort.flowSort.heavyBulky'},
+            {name:'AFE1 Induct',frPid:'01003051',frMatch:'AFE1 Induct'},
+            {name:'AFE 1 Rebin',frPid:'01003051',frMatch:'AFE 1 Rebin'},
             {name:'Flow Sort - Total',id:'ppr.detail.outbound.sort.flowSort.total',b:1},
             {name:'Chutings - Small',id:'ppr.detail.outbound.pack.chuting.small'},
             {name:'Chutings - Medium',id:'ppr.detail.outbound.pack.chuting.medium'},
@@ -103,6 +107,9 @@
             {name:'Pack Singles - Small',id:'ppr.detail.outbound.pack.packSingle.small'},
             {name:'Pack Singles - Medium',id:'ppr.detail.outbound.pack.packSingle.medium'},
             {name:'Pack Singles - Large',id:'ppr.detail.outbound.pack.packSingle.large'},
+            {name:'SingleMedium',frPid:'01002993',frMatch:'Scan Verify Medium'},
+            {name:'SingleMedium2',frPid:'01002993',frMatch:'Pack Kaizen 1'},
+            {name:'SingleNoSLAM',frPid:'01002993',frMatch:'Slam At Pack'},
             {name:'Pack Singles - Total',id:'ppr.detail.outbound.pack.packSingle.total',b:1},
             {name:'Pack Multis - Small',id:'ppr.detail.outbound.pack.packMultis.small'},
             {name:'Pack Multis - Medium',id:'ppr.detail.outbound.pack.packMultis.medium'},
@@ -290,6 +297,10 @@
         nx();
     }
     function GS(di,sn,spIdx){return(_supDetail[di]&&_supDetail[di][sn]&&_supDetail[di][sn][spIdx])||[];}
+    var _frData={};
+    function parseFRRate(html,matchName){var doc=new DOMParser().parseFromString(html,'text/html');var tables=doc.querySelectorAll('table');for(var ti=0;ti<tables.length;ti++){var trs=tables[ti].querySelectorAll('tbody tr');var curF='';for(var r=0;r<trs.length;r++){var th=trs[r].querySelector('th');var tds=trs[r].querySelectorAll('td');if(th){var ht=th.textContent.trim();if(ht&&ht!=='-'&&ht!=='Total')curF=ht;}if(matchName!=='*ALL*'&&curF.toLowerCase().indexOf(matchName.toLowerCase())===-1)continue;if(tds.length>=2&&tds[0].textContent.trim()==='Total'){var hrs=pN(tds[1].textContent.trim());var nums=[];for(var c=2;c<tds.length;c++)nums.push(pN(tds[c].textContent.trim()));var rate=0;for(var ni=3;ni<nums.length;ni+=4){if(nums[ni]>0){rate=nums[ni];break;}}if(!rate){for(var ni2=1;ni2<nums.length;ni2+=2){if(nums[ni2]>0){rate=nums[ni2];break;}}}return{tph:rate,hrs:hrs};}}}return null;}
+    function GFR(di,sn,pid,match){var k=di+'_'+sn+'_'+pid;var h=_frData[k];return h?parseFRRate(h,match):null;}
+    function fetchFRData(onP,onD){_frData={};var pids={};for(var s=0;s<OPS.length;s++){for(var it=0;it<OPS[s].items.length;it++){var itm=OPS[s].items[it];if(itm.frPid)pids[itm.frPid]=1;}}var pidList=Object.keys(pids);if(!pidList.length){onD();return;}var q=[];for(var di=0;di<_days.length;di++){var day=_days[di];var sh=shDay(day);for(var si=0;si<sh.length;si++){for(var pi=0;pi<pidList.length;pi++){var url=buildFRUrl(day,sh[si],pidList[pi]);if(url)q.push({di:di,sn:sh[si].name,pid:pidList[pi],url:url});}}}var total=q.length,done=0,idx=0,act=0,fin2=false;if(!total){onD();return;}setTimeout(function(){if(!fin2){fin2=true;onD();}},60000);function fin(){done++;act--;onP(done,total);if(done>=total){if(!fin2){fin2=true;onD();}}else nx();}function nx(){while(act<3&&idx<q.length){(function(j){act++;fP(j.url,function(h){if(h)_frData[j.di+'_'+j.sn+'_'+j.pid]=h;fin();});})(q[idx]);idx++;}}nx();}
 
     // Ã¢â€â‚¬Ã¢â€â‚¬ UI HELPERS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
     var TH='padding:5px 8px;border:1px solid #ccc;color:#222;font-size:0.78em;text-align:center;white-space:nowrap;';
@@ -554,7 +565,7 @@
                     var itr=el('tr','background:'+bgc+';');
                     itr.appendChild(el('td',TD+'text-align:left;padding-left:'+(item.b?'6':'14')+'px;position:sticky;left:0;background:'+bgc+';z-index:1;'+(item.b?'font-weight:bold;':''),item.name));
                     var iST=0,iSD=0,iC=0;
-                    for(var dk4=0;dk4<dayDefs.length;dk4++){var d=G(dayDefs[dk4].di,shift,item.id);var tp2=d?d.tphN:0,dl2=d?d.dltN:0;iST+=tp2;iSD+=dl2;if(tp2)iC++;
+                    for(var dk4=0;dk4<dayDefs.length;dk4++){var d=item.id?G(dayDefs[dk4].di,shift,item.id):null;var fr=item.frPid?GFR(dayDefs[dk4].di,shift,item.frPid,item.frMatch):null;var tp2=fr?fr.tph:(d?d.tphN:0),dl2=d?d.dltN:0;iST+=tp2;iSD+=dl2;if(tp2)iC++;
                         itr.appendChild(el('td',TD+(item.b?'font-weight:bold;border-left:2px solid #999;':'border-left:2px solid #999;'),fmtN(tp2)));itr.appendChild(el('td',TD+'color:'+dC(dl2)+';'+(item.b?'font-weight:bold;':''),fmtD(dl2)));}
                     itr.appendChild(el('td',TD+'font-weight:bold;color:#4caf50;border-left:2px solid #999;',fmtAvg(iC?(iST/iC):0)));
                     itr.appendChild(el('td',TD+'font-weight:bold;color:'+dC(iSD)+';',fmtD(iSD)));
@@ -728,9 +739,9 @@
                 for(var di3=0;di3<_days.length;di3++){var day3=_days[di3];
                     var itr2=el('tr','background:'+(di3%2===0?'#fff':'#f5f6f8')+';');
                     itr2.appendChild(el('td',TD+'text-align:left;font-weight:bold;',DDE[day3.getDay()]+' '+fSh(day3)));
-                    for(var sn7=0;sn7<sn.length;sn7++){var d2=G(di3,sn[sn7],item2.id);
-                        itr2.appendChild(el('td',TD,d2?d2.tph:'-'));
-                        itr2.appendChild(el('td',TD+'color:'+dC(d2?d2.dltN:0)+';',d2?d2.dlt:'-'));}
+                    for(var sn7=0;sn7<sn.length;sn7++){var d2=item2.id?G(di3,sn[sn7],item2.id):null;var fr2=item2.frPid?GFR(di3,sn[sn7],item2.frPid,item2.frMatch):null;
+                        itr2.appendChild(el('td',TD,fr2?fr2.tph.toLocaleString():(d2?d2.tph:'-')));
+                        itr2.appendChild(el('td',TD+'color:'+dC((item2.frPid?0:(d2?d2.dltN:0)))+';',(item2.frPid?'-':(d2?d2.dlt:'-'))));}
                     itb.appendChild(itr2);}
                 it.appendChild(itb);
                 col(pp2,item2.name,'#aaa',it,false);
@@ -795,7 +806,7 @@
         for(var s=0;s<OPS.length;s++){
             allItems.push({label:OPS[s].label+' Total',id:OPS[s].tid,sec:OPS[s].label,color:OPS[s].color});
             for(var i=0;i<OPS[s].items.length;i++)
-                allItems.push({label:OPS[s].items[i].name,id:OPS[s].items[i].id,sec:OPS[s].label,color:OPS[s].color});
+                allItems.push({label:OPS[s].items[i].name,id:OPS[s].items[i].id,frPid:OPS[s].items[i].frPid,frMatch:OPS[s].items[i].frMatch,sec:OPS[s].label,color:OPS[s].color});
         }
         var sn=shNames();
 
@@ -842,8 +853,8 @@
                 var sh=shDay(day);var hasShift=false;
                 for(var j=0;j<sh.length;j++){if(sh[j].name===shift){hasShift=true;break;}}
                 if(!hasShift)continue;
-                var d=G(di,shift,item.id);
-                var tph=d?d.tphN:0;
+                var d=item.id?G(di,shift,item.id):null;var fr=item.frPid?GFR(di,shift,item.frPid,item.frMatch):null;
+                var tph=fr?fr.tph:(d?d.tphN:0);
                 dayData.push({day:day,tph:tph});
                 sum+=tph;if(tph)cnt++;
             }
@@ -1055,11 +1066,11 @@
                 function(s){pUp('PPR Data',s.done,s.total);stB.textContent='PPR: '+s.done+'/'+s.total;},
                 function(){
                     fetchSupDetail(function(s2){pUp('Support Detail',s2.done,s2.total);stB.textContent='Support: '+s2.done+'/'+s2.total;},function(){
-                        pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';
+                    fetchFRData(function(d,t){pLabel.textContent='Rates '+d+'/'+t;},function(){                        pBarInner.style.width='100%';pPct.textContent='100%';pLabel.textContent='\u2705 Complete!';
                         ldB.disabled=false;ldB.textContent='\u21bb Reload';
                         var now=new Date();stB.textContent='\u2705 '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());stB.style.color='#4caf50';
                         rOverview(tP.ov);rByShift(tP.bs);rCompare(tP.cp);rSnapshot(tP.sn);
-                        if(_isScriptReload)_restoreTabState();_isScriptReload=false;
+                        if(_isScriptReload)_restoreTabState();_isScriptReload=false;});
                     });
                 });
         }
